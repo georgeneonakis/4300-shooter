@@ -1,0 +1,67 @@
+Core shit
+
+1. Set up base project on github
+
+2. Implement directional shooting
+ - Rotate player to always face cursor
+
+3. Implement multiple weapons
+ - Come up with the weapons
+ - Weapon component
+ - Switch between weapons with 1,2,3,4
+ - Only switch to weapons that you have already picked up
+
+4. Implement HP system
+ - Make an HP component
+ - Make a damage component
+
+5. Items, inventory, inventory menu
+ - Come up with the items
+ - Inventory component
+ - Represent items in the world / pick them up
+ - Use items
+ - Display inventory menu
+
+6. Add gravity component
+ - Make things move properly toward an attractor
+
+7. Steering
+ - Rockets / possibly entity steering
+
+Extras
+
+8. Reloading
+ - Add ammo to weapon component
+ - Display current ammo somehow
+ - Have a reload button
+
+9. Ricochet
+ - Make some bouncing bullets
+
+10. Dashing / Teleportation
+ - Make some kind of short-range dash
+ - Make doors that can teleport to other areas
+
+11. Stealth
+ - Make something that blocks vision but not movement
+
+12. Explosions
+ - Decide whether to do frag or actual radius explosion
+
+13. Maybe slow motion
+
+Finishing Touches
+
+14. Advanced enemy AI / Boss AI
+ - Possibly implement shooting AI
+ - Come up with some boss AI and code it in a way that is easy to put in config file
+
+15. Menu with level select / final boss
+ - Make the menu
+ - Make it possible for the menu to recognize which levels you have beaten
+
+16. Art and sound assets
+ - Get all that shit otg
+
+17. Actually make the levels
+ - And make them good
