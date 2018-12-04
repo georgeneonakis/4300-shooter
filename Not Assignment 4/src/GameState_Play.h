@@ -13,6 +13,11 @@ struct PlayerConfig
     float X, Y, CX, CY, SPEED;
 };
 
+struct BulletConfig
+{
+	float CX, CY, SPEED, LIFESPAN;
+};
+
 class GameState_Play : public GameState
 {
 
@@ -22,6 +27,7 @@ protected:
     std::shared_ptr<Entity> m_player;
     std::string             m_levelPath;
     PlayerConfig            m_playerConfig;
+	BulletConfig			m_bulletConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = false;
@@ -34,7 +40,7 @@ protected:
 
     void update();
     void spawnPlayer();
-    void spawnSword(std::shared_ptr<Entity> entity);
+    void fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & target);
     
     void sMovement();
     void sAI();

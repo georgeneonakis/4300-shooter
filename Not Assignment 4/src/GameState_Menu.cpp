@@ -13,7 +13,7 @@ GameState_Menu::GameState_Menu(GameEngine & game)
 
 void GameState_Menu::init(const std::string & menuConfig)
 {
-    m_title = "Definitely Not Zelda";
+    m_title = "The Boys Make A Game";
     m_menuStrings.push_back("Level  1");
     m_menuStrings.push_back("Level  2");
     m_menuStrings.push_back("Level  3");

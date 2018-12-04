@@ -72,6 +72,11 @@ void GameState_Play::loadLevel(const std::string & filename)
 		{
 			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED;
 		}
+
+		else if (start == "Bullet")
+		{
+			fin >> m_bulletConfig.CX >> m_bulletConfig.CY >> m_bulletConfig.SPEED >> m_bulletConfig.LIFESPAN;
+		}
 		getline(fin, empty, '\n');
 	}
     spawnPlayer();
@@ -85,40 +90,22 @@ void GameState_Play::spawnPlayer()
     m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandDown"), true);
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
-    m_player->getComponent<CTransform>()->facing = Vec2(0, 1);
 }
 
-// Spawn a sword when the player attacks
-void GameState_Play::spawnSword(std::shared_ptr<Entity> entity)
+// Fire the current weapon at the cursor
+void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & target)
 {
-    auto eTransform = entity->getComponent<CTransform>();
-    auto sword = m_entityManager.addEntity("sword");
-
-	// Sword disappears after 150 milliseconds
-	sword->addComponent<CLifeSpan>(150);
-	sword->addComponent<CTransform>(entity->getComponent<CTransform>()->pos);
-
-	// Choose the appropriate animation based on which direction the player is facing
-	if (eTransform->facing == Vec2(1, 0))
-	{
-		sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-	}
-	if (eTransform->facing == Vec2(-1, 0))
-	{
-		sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-		sword->getComponent<CTransform>()->scale.x = -1;
-	}
-	if (eTransform->facing == Vec2(0, 1))
-	{
-		sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordUp"), true);
-		sword->getComponent<CTransform>()->scale.y = -1;
-	}
-	if (eTransform->facing == Vec2(0, -1))
-	{
-		sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordUp"), true);
-	}
-	sword->addComponent<CBoundingBox>(Vec2(sword->getComponent<CAnimation>()->animation.getSize()), false, false);
-	sword->getComponent<CTransform>()->pos = Vec2(entity->getComponent<CTransform>()->pos + eTransform->facing * (m_playerConfig.CX + sword->getComponent<CBoundingBox>()->size.x) / 2);
+	// Calculate velocity of the bullet
+	Vec2 difference = target - entity->getComponent<CTransform>()->pos;
+	float distance = target.dist(entity->getComponent<CTransform>()->pos);
+	difference /= distance;
+	auto bullet = m_entityManager.addEntity("Bullet");
+	// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
+	bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_bulletConfig.SPEED * difference.x, m_bulletConfig.SPEED * difference.y), 
+									 Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+	bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+	bullet->addComponent<CBoundingBox>(Vec2(m_bulletConfig.CX, m_bulletConfig.CY), false, false);
+	bullet->addComponent<CLifeSpan>(m_bulletConfig.LIFESPAN);
 }
 
 // Game loop
@@ -162,60 +149,18 @@ void GameState_Play::sMovement()
 	{
 		pTransform->speed.x += m_playerConfig.SPEED;
 	}
-	// Player cannot move horizontally and vertically at the same time
-	if (pTransform->speed.x != 0.0 && pTransform->speed.y != 0.0)
-	{
-		pTransform->speed.x = 0.0;
-	}
-	// Make the player 'face' the right direction for animation assignment
-	if (pTransform->speed.x > 0)
-	{
-		pTransform->facing = Vec2(1, 0);
-	}
-	if (pTransform->speed.x < 0)
-	{
-		pTransform->facing = Vec2(-1, 0);
-	}
-	if (pTransform->speed.y > 0)
-	{
-		pTransform->facing = Vec2(0, 1);
-	}
-	if (pTransform->speed.y < 0)
-	{
-		pTransform->facing = Vec2(0, -1);
-	}
+
+	// Rotate player to face cursor
+	Vec2 mousePosition = Vec2(sf::Mouse::getPosition(m_game.window()).x, sf::Mouse::getPosition(m_game.window()).y) - Vec2(m_windowX / 2, m_windowY / 2);
+	Vec2 relativePosition = mousePosition + Vec2(m_player->getComponent<CTransform>()->pos);
+	Vec2 difference = m_player->getComponent<CTransform>()->pos - relativePosition;
+	m_player->getComponent<CTransform>()->angle = -atan2(difference.x, difference.y) * 180 / 3.14159;
+	
 	// Move all entities
 	for (auto e : m_entityManager.getEntities())
 	{
 		e->getComponent<CTransform>()->prevPos = Vec2(e->getComponent<CTransform>()->pos);
 		e->getComponent<CTransform>()->pos += e->getComponent<CTransform>()->speed;
-	}
-	// Move and rotate the sword relative to the player if it is active
-	for (auto sword : m_entityManager.getEntities("sword"))
-	{
-		auto eTransform = m_player->getComponent<CTransform>();
-		sword->getComponent<CTransform>()->pos = Vec2(eTransform->pos + eTransform->facing * (m_playerConfig.CX + sword->getComponent<CBoundingBox>()->size.x) / 2);
-
-		if (eTransform->facing == Vec2(1, 0))
-		{
-			sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-			sword->getComponent<CTransform>()->scale.x = 1;
-		}
-		if (eTransform->facing == Vec2(-1, 0))
-		{
-			sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-			sword->getComponent<CTransform>()->scale.x = -1;
-		}
-		if (eTransform->facing == Vec2(0, 1))
-		{
-			sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordUp"), true);
-			sword->getComponent<CTransform>()->scale.y = -1;
-		}
-		if (eTransform->facing == Vec2(0, -1))
-		{
-			sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordUp"), true);
-			sword->getComponent<CTransform>()->scale.y = 1;
-		}
 	}
 }
 
@@ -289,7 +234,7 @@ void GameState_Play::sAI()
 // Track entity lifespans and destroy them if they expire
 void GameState_Play::sLifespan()
 {
-	for (auto e : m_entityManager.getEntities("sword"))
+	for (auto e : m_entityManager.getEntities("Bullet"))
 	{
 		int elap = e->getComponent<CLifeSpan>()->clock.getElapsedTime().asMilliseconds();
 		int life = e->getComponent<CLifeSpan>()->lifespan;
@@ -297,8 +242,6 @@ void GameState_Play::sLifespan()
 		if (elap > life)
 		{
 			e->destroy();
-			// Player can only attack once the active sword has expired
-			m_player->getComponent<CInput>()->canShoot = true;
 		}
 	}
 }
@@ -384,6 +327,15 @@ void GameState_Play::sCollision()
 				}
 			}
 		}
+		// Check for bullet collisions with tiles
+		for (auto bullet : m_entityManager.getEntities("Bullet"))
+		{
+			Vec2 bulletOverlap = Physics::GetOverlap(e, bullet);
+			if (bulletOverlap.x > 0 && bulletOverlap.y > 0 && e->getComponent<CBoundingBox>()->blockVision)
+			{
+				bullet->destroy();
+			}
+		}
 	}
 	// Check for collisions with NPCs
 	for (auto e : m_entityManager.getEntities("NPC"))
@@ -394,11 +346,11 @@ void GameState_Play::sCollision()
 		{
 			m_player->getComponent<CTransform>()->pos = Vec2(m_playerConfig.X, m_playerConfig.Y);
 		}
-		// Destroy the NPC if it collides with a sword
-		for (auto sword : m_entityManager.getEntities("sword"))
+		// Destroy the NPC if it collides with a bullet
+		for (auto bullet : m_entityManager.getEntities("Bullet"))
 		{
-			Vec2 swordOverlap = Physics::GetOverlap(e, sword);
-			if (swordOverlap.x > 0 && swordOverlap.y > 0)
+			Vec2 bulletOverlap = Physics::GetOverlap(e, bullet);
+			if (bulletOverlap.x > 0 && bulletOverlap.y > 0)
 			{
 				// Instantiate an explosion animation before destroying the NPC entity
 				auto explosion = m_entityManager.addEntity("explosion");
@@ -417,89 +369,6 @@ void GameState_Play::sAnimation()
 {
 	for (auto e : m_entityManager.getEntities())
 	{
-		// Assign correct player animation based on their status
-		if (e->tag() == "player")
-		{
-			auto eTransform = e->getComponent<CTransform>();
-			// Facing right
-			if (eTransform->facing == Vec2(1, 0))
-			{
-				e->getComponent<CTransform>()->scale.x = 1;
-				// Attacking
-				if (!e->getComponent<CInput>()->canShoot)
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("AtkRight"), true);
-				}
-				// Moving
-				else if (eTransform->speed != Vec2(0, 0) && e->getComponent<CAnimation>()->animation.getName() != "RunRight")
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("RunRight"), true);
-				}
-				// Standing
-				else if (eTransform->speed == Vec2(0, 0))
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandRight"), true);
-				}
-			}
-			// Facing left
-			else if (eTransform->facing == Vec2(-1, 0))
-			{
-				e->getComponent<CTransform>()->scale.x = -1;
-				// Attacking
-				if (!e->getComponent<CInput>()->canShoot)
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("AtkRight"), true);
-				}
-				// Moving
-				else if (eTransform->speed != Vec2(0, 0) && e->getComponent<CAnimation>()->animation.getName() != "RunRight")
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("RunRight"), true);
-				}
-				// Standing
-				else if (eTransform->speed == Vec2(0, 0))
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandRight"), true);
-				}
-			}
-			// Facing up
-			else if (eTransform->facing == Vec2(0, -1))
-			{
-				// Attacking
-				if (!e->getComponent<CInput>()->canShoot)
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("AtkUp"), true);
-				}
-				// Moving
-				else if (eTransform->speed != Vec2(0, 0) && e->getComponent<CAnimation>()->animation.getName() != "RunUp")
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("RunUp"), true);
-				}
-				// Standing
-				else if (eTransform->speed == Vec2(0, 0))
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandUp"), true);
-				}
-			}
-			// Facing down
-			else if (eTransform->facing == Vec2(0, 1))
-			{
-				// Attacking
-				if (!e->getComponent<CInput>()->canShoot)
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("AtkDown"), true);
-				}
-				// Moving
-				else if (eTransform->speed != Vec2(0, 0) && e->getComponent<CAnimation>()->animation.getName() != "RunDown")
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("RunDown"), true);
-				}
-				// Standing
-				else if (eTransform->speed == Vec2(0, 0))
-				{
-					e->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandDown"), true);
-				}
-			}
-		}
 		// Update all animations and destroy entities if their animation ends without looping
 		e->getComponent<CAnimation>()->animation.update();
 		if (e->getComponent<CAnimation>()->animation.hasEnded() && !(e->getComponent<CAnimation>()->repeat))
@@ -533,18 +402,7 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::Z:       { init(m_levelPath); break; }
                 case sf::Keyboard::R:       { m_drawTextures = !m_drawTextures; break; }
                 case sf::Keyboard::F:       { m_drawCollision = !m_drawCollision; break; }
-                case sf::Keyboard::Y:       { m_follow = !m_follow; break; }
                 case sf::Keyboard::P:       { setPaused(!m_paused); break; }
-				case sf::Keyboard::Space:	
-				{
-					// Only attack if the player is not already attacking
-					if (pInput->canShoot)
-					{
-						spawnSword(m_player);
-						pInput->canShoot = false;
-						break;
-					}
-				}
             }
         }
 
@@ -556,9 +414,28 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::A:       { pInput->left = false; break; }
                 case sf::Keyboard::S:       { pInput->down = false; break; }
                 case sf::Keyboard::D:       { pInput->right = false; break; }
-                case sf::Keyboard::Space:   { pInput->shoot = false; break; }
             }
         }
+
+		if (event.type == sf::Event::MouseButtonPressed)
+		{
+			// Fire a bullet
+			if (event.mouseButton.button == sf::Mouse::Left)
+			{
+				if (m_player->getComponent<CInput>()->canShoot)
+				{
+					Vec2 mousePosition = Vec2(event.mouseButton.x - m_windowX / 2, event.mouseButton.y - m_windowY / 2);
+					Vec2 target = mousePosition + Vec2(m_player->getComponent<CTransform>()->pos);
+					fireWeapon(m_player, target);
+					m_player->getComponent<CInput>()->canShoot = false;
+				}
+			}
+		}
+
+		if (event.type == sf::Event::MouseButtonReleased)
+		{
+			m_player->getComponent<CInput>()->canShoot = true;
+		}
     }
 }
 
@@ -566,22 +443,10 @@ void GameState_Play::sUserInput()
 void GameState_Play::sRender()
 {
     m_game.window().clear(sf::Color(255, 192, 122));
-
 	sf::View view = m_game.window().getView();
-	// Center camera on the player if follow is enabled
-	if (m_follow)
-	{
-		view.setCenter(sf::Vector2f(m_player->getComponent<CTransform>()->pos.x, m_player->getComponent<CTransform>()->pos.y));
-	}
-	// Center camera on player's current room
-	else
-	{
-		int roomX = m_player->getComponent<CTransform>()->pos.x / m_windowX;
-		int roomY = m_player->getComponent<CTransform>()->pos.y / m_windowY;
-		roomX = m_player->getComponent<CTransform>()->pos.x < 0 ? roomX - 1 : roomX;
-		roomY = m_player->getComponent<CTransform>()->pos.y < 0 ? roomY - 1 : roomY;
-		view.setCenter(sf::Vector2f(roomX * m_windowX + m_windowX / 2, roomY * m_windowY + m_windowY / 2));
-	}
+
+	// Center camera on the player
+	view.setCenter(sf::Vector2f(m_player->getComponent<CTransform>()->pos.x, m_player->getComponent<CTransform>()->pos.y));
 	m_game.window().setView(view);
 
     // draw all Entity textures / animations
