@@ -104,4 +104,8 @@ Tile WaterBM -1 0   3  8 1 0
 Tile WaterBR -1 0   4  8 1 0
 NPC  Tektite -1 0   1  4 0 0 Follow 2
 Player 640 360 48 48 5
-Bullet 20 20 25 2000
+Pistol 20 20 25 2000
+Shotgun 10 10 25 1000 1000
+Rifle 15 15 25 2000 100
+Launcher 50 50 10 1000 2000
+Frag 5 5 30 100 18

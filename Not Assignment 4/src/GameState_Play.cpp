@@ -73,9 +73,25 @@ void GameState_Play::loadLevel(const std::string & filename)
 			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED;
 		}
 
-		else if (start == "Bullet")
+		else if (start == "Pistol")
 		{
-			fin >> m_bulletConfig.CX >> m_bulletConfig.CY >> m_bulletConfig.SPEED >> m_bulletConfig.LIFESPAN;
+			fin >> m_pistolConfig.CX >> m_pistolConfig.CY >> m_pistolConfig.SPEED >> m_pistolConfig.LIFESPAN;
+		}
+		else if (start == "Shotgun")
+		{
+			fin >> m_shotgunConfig.CX >> m_shotgunConfig.CY >> m_shotgunConfig.SPEED >> m_shotgunConfig.LIFESPAN >> m_shotgunConfig.FIRERATE;
+		}
+		else if (start == "Rifle")
+		{
+			fin >> m_rifleConfig.CX >> m_rifleConfig.CY >> m_rifleConfig.SPEED >> m_rifleConfig.LIFESPAN >> m_rifleConfig.FIRERATE;
+		}
+		else if (start == "Launcher")
+		{
+			fin >> m_launcherConfig.CX >> m_launcherConfig.CY >> m_launcherConfig.SPEED >> m_launcherConfig.LIFESPAN >> m_launcherConfig.FIRERATE;
+		}
+		else if (start == "Frag")
+		{
+			fin >> m_fragConfig.CX >> m_fragConfig.CY >> m_fragConfig.SPEED >> m_fragConfig.LIFESPAN >> m_fragConfig.FIRERATE;
 		}
 		getline(fin, empty, '\n');
 	}
@@ -90,22 +106,64 @@ void GameState_Play::spawnPlayer()
     m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandDown"), true);
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
+	m_player->addComponent<CWeapons>(true, true, true);
 }
 
 // Fire the current weapon at the cursor
 void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & target)
 {
 	// Calculate velocity of the bullet
+	auto weapon = m_player->getComponent<CWeapons>();
 	Vec2 difference = target - entity->getComponent<CTransform>()->pos;
 	float distance = target.dist(entity->getComponent<CTransform>()->pos);
-	difference /= distance;
-	auto bullet = m_entityManager.addEntity("Bullet");
-	// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
-	bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_bulletConfig.SPEED * difference.x, m_bulletConfig.SPEED * difference.y), 
-									 Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-	bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-	bullet->addComponent<CBoundingBox>(Vec2(m_bulletConfig.CX, m_bulletConfig.CY), false, false);
-	bullet->addComponent<CLifeSpan>(m_bulletConfig.LIFESPAN);
+	Vec2 normal = difference / distance;
+	if (weapon->current == 1 && weapon->canShoot)
+	{
+		auto bullet = m_entityManager.addEntity("Bullet");
+		// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
+		bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_pistolConfig.SPEED * normal.x, m_pistolConfig.SPEED * normal.y),
+			Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+		bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+		bullet->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
+		bullet->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
+	}
+	else if (weapon->current == 2 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
+	{
+		int theta = atan2(normal.y, normal.x) * 180 / 3.14159;
+		for (int i = -16; i <= 16; i += 4)
+		{
+			int newTheta = theta + i;
+			Vec2 newNormal = Vec2(cos(newTheta * 3.14159 / 180), sin(newTheta * 3.14159 / 180));
+			auto bullet = m_entityManager.addEntity("Bullet");
+			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_shotgunConfig.SPEED * newNormal.x, m_shotgunConfig.SPEED * newNormal.y),
+				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+			bullet->addComponent<CBoundingBox>(Vec2(m_shotgunConfig.CX, m_shotgunConfig.CY), false, false);
+			bullet->addComponent<CLifeSpan>(m_shotgunConfig.LIFESPAN / 4);
+			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_shotgunConfig.FIRERATE;
+		}
+	}
+	else if (weapon->current == 3 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
+	{
+		auto bullet = m_entityManager.addEntity("Bullet");
+		// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
+		bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_rifleConfig.SPEED * normal.x, m_rifleConfig.SPEED * normal.y),
+			Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+		bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+		bullet->addComponent<CBoundingBox>(Vec2(m_rifleConfig.CX, m_rifleConfig.CY), false, false);
+		bullet->addComponent<CLifeSpan>(m_rifleConfig.LIFESPAN);
+		weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_rifleConfig.FIRERATE;
+	}
+	else if (weapon->current == 4 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
+	{
+		auto grenade = m_entityManager.addEntity("Grenade");
+		grenade->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_launcherConfig.SPEED * normal.x, m_launcherConfig.SPEED * normal.y),
+			Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+		grenade->addComponent<CAnimation>(m_game.getAssets().getAnimation("RockTM"), true);
+		grenade->addComponent<CBoundingBox>(Vec2(m_launcherConfig.CX, m_launcherConfig.CY), false, false);
+		grenade->addComponent<CLifeSpan>(m_launcherConfig.LIFESPAN);
+		weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_launcherConfig.FIRERATE;
+	}
 }
 
 // Game loop
@@ -244,6 +302,30 @@ void GameState_Play::sLifespan()
 			e->destroy();
 		}
 	}
+	for (auto e : m_entityManager.getEntities("Grenade"))
+	{
+		int elap = e->getComponent<CLifeSpan>()->clock.getElapsedTime().asMilliseconds();
+		int life = e->getComponent<CLifeSpan>()->lifespan;
+
+		if (elap > life)
+		{
+			Vec2 source = e->getComponent<CTransform>()->pos;
+			for (int i = 1; i <= m_fragConfig.FIRERATE; i++)
+			{
+				Vec2 newPosition = Vec2(source.x + cos(360 / m_fragConfig.FIRERATE * i * 3.1415926 / 180), source.y + sin(360 / m_fragConfig.FIRERATE * i * 3.1415926 / 180));
+				Vec2 difference = newPosition - source;
+				float distance = source.dist(newPosition);
+				Vec2 normal = difference / distance;
+				auto bullet = m_entityManager.addEntity("Bullet");
+				bullet->addComponent<CTransform>(Vec2(source), Vec2(m_fragConfig.SPEED * normal.x, m_fragConfig.SPEED * normal.y),
+					Vec2(1, 1), -atan2(normal.x, normal.y) * 180 / 3.14159);
+				bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("RockTL"), true);
+				bullet->addComponent<CBoundingBox>(Vec2(m_fragConfig.CX, m_fragConfig.CY), false, false);
+				bullet->addComponent<CLifeSpan>(m_fragConfig.LIFESPAN);
+			}
+			e->destroy();
+		}
+	}
 }
 
 // Check for collisions between entities
@@ -336,6 +418,44 @@ void GameState_Play::sCollision()
 				bullet->destroy();
 			}
 		}
+		for (auto grenade : m_entityManager.getEntities("Grenade"))
+		{
+			Vec2 grenadeOverlap = Physics::GetOverlap(e, grenade);
+			if (grenadeOverlap.x > 0 && grenadeOverlap.y > 0 && e->getComponent<CBoundingBox>()->blockVision)
+			{
+				Vec2 prevOverlap = Physics::GetPreviousOverlap(e, grenade);
+				// Grenade colliding from the side
+				if (prevOverlap.x <= 0 && prevOverlap.y > 0)
+				{
+					grenade->getComponent<CTransform>()->speed.x *= -1;
+					// Colliding from the left 
+					if (grenade->getComponent<CTransform>()->pos.x < e->getComponent<CTransform>()->pos.x)
+					{
+						grenade->getComponent<CTransform>()->pos.x -= grenadeOverlap.x;
+					}
+					// Colliding from the right
+					else
+					{
+						grenade->getComponent<CTransform>()->pos.x += grenadeOverlap.x;
+					}
+				}
+				// Grenade colliding from the top or bottom
+				else
+				{
+					grenade->getComponent<CTransform>()->speed.y *= -1;
+					// Colliding from the top
+					if (grenade->getComponent<CTransform>()->pos.y < e->getComponent<CTransform>()->pos.y)
+					{
+						grenade->getComponent<CTransform>()->pos.y -= grenadeOverlap.y;
+					}
+					// Colliding from the bottom
+					else
+					{
+						grenade->getComponent<CTransform>()->pos.y += grenadeOverlap.y;
+					}
+				}
+			}
+		}
 	}
 	// Check for collisions with NPCs
 	for (auto e : m_entityManager.getEntities("NPC"))
@@ -359,6 +479,7 @@ void GameState_Play::sCollision()
 				explosion->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
 				explosion->addComponent<CLifeSpan>(2000);
 				e->destroy();
+				bullet->destroy();
 			}
 		}
 	}
@@ -383,6 +504,14 @@ void GameState_Play::sUserInput()
 {
     auto pInput = m_player->getComponent<CInput>();
 
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	{
+		Vec2 mousePosition = Vec2(sf::Mouse::getPosition(m_game.window()).x - m_windowX / 2, sf::Mouse::getPosition(m_game.window()).y - m_windowY / 2);
+		Vec2 target = mousePosition + Vec2(m_player->getComponent<CTransform>()->pos);
+		fireWeapon(m_player, target);
+		m_player->getComponent<CWeapons>()->canShoot = false;
+	}
+
     sf::Event event;
     while (m_game.window().pollEvent(event))
     {
@@ -403,6 +532,31 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::R:       { m_drawTextures = !m_drawTextures; break; }
                 case sf::Keyboard::F:       { m_drawCollision = !m_drawCollision; break; }
                 case sf::Keyboard::P:       { setPaused(!m_paused); break; }
+				case sf::Keyboard::Num1:	{ m_player->getComponent<CWeapons>()->current = 1; break;}
+				case sf::Keyboard::Num2: 
+				{
+					if (m_player->getComponent<CWeapons>()->hasTwo)
+					{
+						m_player->getComponent<CWeapons>()->current = 2;
+					}
+					break;
+				}
+				case sf::Keyboard::Num3:
+				{
+					if (m_player->getComponent<CWeapons>()->hasThree)
+					{
+						m_player->getComponent<CWeapons>()->current = 3;
+					}
+					break;
+				}
+				case sf::Keyboard::Num4:
+				{
+					if (m_player->getComponent<CWeapons>()->hasFour)
+					{
+						m_player->getComponent<CWeapons>()->current = 4;
+					}
+					break;
+				}
             }
         }
 
@@ -417,24 +571,9 @@ void GameState_Play::sUserInput()
             }
         }
 
-		if (event.type == sf::Event::MouseButtonPressed)
-		{
-			// Fire a bullet
-			if (event.mouseButton.button == sf::Mouse::Left)
-			{
-				if (m_player->getComponent<CInput>()->canShoot)
-				{
-					Vec2 mousePosition = Vec2(event.mouseButton.x - m_windowX / 2, event.mouseButton.y - m_windowY / 2);
-					Vec2 target = mousePosition + Vec2(m_player->getComponent<CTransform>()->pos);
-					fireWeapon(m_player, target);
-					m_player->getComponent<CInput>()->canShoot = false;
-				}
-			}
-		}
-
 		if (event.type == sf::Event::MouseButtonReleased)
 		{
-			m_player->getComponent<CInput>()->canShoot = true;
+			m_player->getComponent<CWeapons>()->canShoot = true;
 		}
     }
 }

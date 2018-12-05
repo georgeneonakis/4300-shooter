@@ -55,6 +55,7 @@ Finishing Touches
 14. Advanced enemy AI / Boss AI
  - Possibly implement shooting AI
  - Come up with some boss AI and code it in a way that is easy to put in config file
+ - Weapon-specific weaknesses / color changes
 
 15. Menu with level select / final boss
  - Make the menu

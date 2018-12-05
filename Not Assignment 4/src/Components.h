@@ -49,7 +49,6 @@ public:
     bool left       = false;
     bool right      = false;
     bool shoot      = false;
-    bool canShoot   = true;
 
     CInput() {}
 };
@@ -107,4 +106,18 @@ public:
     size_t currentPosition = 0;
     float speed = 0;
     CPatrol(std::vector<Vec2> & pos, float s) : positions(pos), speed(s) {}
+};
+
+class CWeapons : public Component
+{
+public:
+	sf::Clock clock;
+	int nextFire = 0;
+	bool hasTwo = false;
+	bool hasThree = false;
+	bool hasFour = false;
+	bool canShoot = true;
+	int current = 1;
+	CWeapons(bool two, bool three, bool four)
+		: hasTwo(two), hasThree(three), hasFour(four) {}
 };

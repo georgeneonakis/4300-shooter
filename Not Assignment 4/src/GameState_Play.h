@@ -13,9 +13,9 @@ struct PlayerConfig
     float X, Y, CX, CY, SPEED;
 };
 
-struct BulletConfig
+struct WeaponConfig
 {
-	float CX, CY, SPEED, LIFESPAN;
+	float CX, CY, SPEED, LIFESPAN, FIRERATE;
 };
 
 class GameState_Play : public GameState
@@ -27,7 +27,11 @@ protected:
     std::shared_ptr<Entity> m_player;
     std::string             m_levelPath;
     PlayerConfig            m_playerConfig;
-	BulletConfig			m_bulletConfig;
+	WeaponConfig			m_pistolConfig;
+	WeaponConfig			m_shotgunConfig;
+	WeaponConfig			m_rifleConfig;
+	WeaponConfig			m_launcherConfig;
+	WeaponConfig			m_fragConfig;
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = false;
