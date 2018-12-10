@@ -4,6 +4,7 @@
 #include "Assets.h"
 #include "GameEngine.h"
 #include "Components.h"
+#include <iostream>
 
 GameState_Play::GameState_Play(GameEngine & game, const std::string & levelPath)
     : GameState(game)
@@ -26,6 +27,9 @@ void GameState_Play::loadLevel(const std::string & filename)
 
 	while (std::getline(fin, start, ' '))
 	{
+
+
+
 		if (start == "Tile")
 		{
 			auto block = m_entityManager.addEntity("Tile");
@@ -178,6 +182,7 @@ void GameState_Play::update()
         sLifespan();
         sCollision();
         sAnimation();
+		sSteer();
     }
 
     sUserInput();
@@ -222,11 +227,58 @@ void GameState_Play::sMovement()
 	}
 }
 
+
+
+
+void GameState_Play::sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
+{
+	float speed = 5.0;
+	float scale = 1.0;
+	auto missile = m_entityManager.addEntity("Missile");
+
+
+	// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
+	missile->addComponent<CTransform>(Vec2(shooter->getComponent<CTransform>()->pos), Vec2(-speed, 0),
+		Vec2(1, 1), 0);
+	missile->addComponent<CAnimation>(m_game.getAssets().getAnimation("Arrow"), true);
+	missile->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
+	missile->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
+
+}
+
+
+void GameState_Play::sSteer()
+{
+	float speed = 2.0;
+	float scale = 0.5;
+
+	for (auto e : m_entityManager.getEntities("Missile"))
+	{
+		auto desired = (m_player->getComponent<CTransform>()->pos) - (e->getComponent<CTransform>()->pos);
+		desired = desired / desired.length();
+		desired = desired * e->getComponent<CTransform>()->speed.length();
+		auto steering = desired - e->getComponent<CTransform>()->speed;
+		steering = steering * scale;
+		auto actual = e->getComponent<CTransform>()->speed + steering;
+		e->getComponent<CTransform>()->speed = actual;
+
+		Vec2 playerposition = m_player->getComponent<CTransform>()->pos;
+		Vec2 relative = playerposition + Vec2(e->getComponent<CTransform>()->pos);
+		Vec2 difference = e->getComponent<CTransform>()->pos - relative;
+
+		e->getComponent<CTransform>()->angle = -atan2(difference.x, difference.y) * 180 / 3.14159;
+	}
+
+
+}
+
+sf::Clock clock2;
 // Generate AI behavior
 void GameState_Play::sAI()
 {
 	for (auto e : m_entityManager.getEntities("NPC"))
 	{
+
 		// Patrol behavior
 		if (e->hasComponent<CPatrol>())
 		{
@@ -277,6 +329,11 @@ void GameState_Play::sAI()
 				e->getComponent<CTransform>()->speed = difference;
 			}
 			// If vision is not blocked, pursue player
+			int x = clock2.getElapsedTime().asMilliseconds();
+			if (x % 180 == 0) {
+				sSpawnMissile(e,m_player);
+			}
+
 			else
 			{
 				Vec2 difference = m_player->getComponent<CTransform>()->pos - e->getComponent<CTransform>()->pos;
@@ -284,6 +341,10 @@ void GameState_Play::sAI()
 				difference /= distance;
 				difference *= follow->speed;
 				e->getComponent<CTransform>()->speed = difference;
+
+
+
+				
 			}
 		}
 	}

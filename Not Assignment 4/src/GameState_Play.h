@@ -45,7 +45,10 @@ protected:
     void update();
     void spawnPlayer();
     void fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & target);
-    
+	void sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim);
+
+	void sSteer();
+
     void sMovement();
     void sAI();
     void sLifespan();

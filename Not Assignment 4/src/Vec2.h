@@ -26,4 +26,5 @@ public:
 
     Vec2 abs() const;
     float dist(const Vec2 & rhs) const;
+	float length() const;
 };
