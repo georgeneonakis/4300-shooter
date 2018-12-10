@@ -31,6 +31,7 @@ Texture   TexBush       images/tloz/green/tile_bush.png
 Texture   TexBlack      images/tloz/tile_black.png
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexKnight     images/tloz/knight.png
+Texture   TexArrow	images/tloz/item_arrow_right.png
 Animation Explosion     TexExplode     48    2 
 Animation RunDown       TexRunDown      2   15   
 Animation RunRight      TexRunRight     2   15    
@@ -45,6 +46,7 @@ Animation AtkDown       TexAtkDown      1    0
 Animation AtkRight      TexAtkRight     1    0   
 Animation SwordUp       TexSwordUp      1    0
 Animation SwordRight    TexSwordRight   1    0
+Animation Arrow		TexArrow	1    0
 Animation Black         TexBlack        1    0
 Animation RockTL        TexRockTL       1    0
 Animation RockTM        TexRockTM       1    0
