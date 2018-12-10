@@ -121,3 +121,20 @@ public:
 	CWeapons(bool two, bool three, bool four)
 		: hasTwo(two), hasThree(three), hasFour(four) {}
 };
+
+class CHealth : public Component
+{
+public:
+	int maxHP;
+	int currentHP;
+	CHealth(int hp)
+		: maxHP(hp), currentHP(hp) {}
+};
+
+class CDamage : public Component
+{
+public:
+	int damage;
+	CDamage(int amount)
+		: damage(amount) {}
+};

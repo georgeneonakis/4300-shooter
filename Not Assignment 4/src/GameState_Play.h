@@ -10,12 +10,12 @@
 
 struct PlayerConfig 
 { 
-    float X, Y, CX, CY, SPEED;
+	float X, Y, CX, CY, SPEED, HEALTH;
 };
 
 struct WeaponConfig
 {
-	float CX, CY, SPEED, LIFESPAN, FIRERATE;
+	float CX, CY, SPEED, LIFESPAN, FIRERATE, DAMAGE;
 };
 
 class GameState_Play : public GameState

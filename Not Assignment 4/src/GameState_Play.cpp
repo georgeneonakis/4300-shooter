@@ -27,9 +27,6 @@ void GameState_Play::loadLevel(const std::string & filename)
 
 	while (std::getline(fin, start, ' '))
 	{
-
-
-
 		if (start == "Tile")
 		{
 			auto block = m_entityManager.addEntity("Tile");
@@ -41,7 +38,6 @@ void GameState_Play::loadLevel(const std::string & filename)
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
 		}
-
 		else if (start == "NPC")
 		{
 			auto npc = m_entityManager.addEntity("NPC");
@@ -52,6 +48,7 @@ void GameState_Play::loadLevel(const std::string & filename)
 			npc->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			npc->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			npc->addComponent<CBoundingBox>(npc->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+			npc->addComponent<CHealth>(100);
 			if (aiType == "Follow")
 			{
 				npc->addComponent<CFollowPlayer>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64), speed);
@@ -71,23 +68,21 @@ void GameState_Play::loadLevel(const std::string & filename)
 				npc->addComponent<CPatrol>(positions, speed);
 			}
 		}
-
 		else if (start == "Player")
 		{
-			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED;
+			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH;
 		}
-
 		else if (start == "Pistol")
 		{
-			fin >> m_pistolConfig.CX >> m_pistolConfig.CY >> m_pistolConfig.SPEED >> m_pistolConfig.LIFESPAN;
+			fin >> m_pistolConfig.CX >> m_pistolConfig.CY >> m_pistolConfig.SPEED >> m_pistolConfig.LIFESPAN >> m_pistolConfig.DAMAGE;
 		}
 		else if (start == "Shotgun")
 		{
-			fin >> m_shotgunConfig.CX >> m_shotgunConfig.CY >> m_shotgunConfig.SPEED >> m_shotgunConfig.LIFESPAN >> m_shotgunConfig.FIRERATE;
+			fin >> m_shotgunConfig.CX >> m_shotgunConfig.CY >> m_shotgunConfig.SPEED >> m_shotgunConfig.LIFESPAN >> m_shotgunConfig.FIRERATE >> m_shotgunConfig.DAMAGE;
 		}
 		else if (start == "Rifle")
 		{
-			fin >> m_rifleConfig.CX >> m_rifleConfig.CY >> m_rifleConfig.SPEED >> m_rifleConfig.LIFESPAN >> m_rifleConfig.FIRERATE;
+			fin >> m_rifleConfig.CX >> m_rifleConfig.CY >> m_rifleConfig.SPEED >> m_rifleConfig.LIFESPAN >> m_rifleConfig.FIRERATE >> m_rifleConfig.DAMAGE;
 		}
 		else if (start == "Launcher")
 		{
@@ -95,7 +90,7 @@ void GameState_Play::loadLevel(const std::string & filename)
 		}
 		else if (start == "Frag")
 		{
-			fin >> m_fragConfig.CX >> m_fragConfig.CY >> m_fragConfig.SPEED >> m_fragConfig.LIFESPAN >> m_fragConfig.FIRERATE;
+			fin >> m_fragConfig.CX >> m_fragConfig.CY >> m_fragConfig.SPEED >> m_fragConfig.LIFESPAN >> m_fragConfig.FIRERATE >> m_fragConfig.DAMAGE;
 		}
 		getline(fin, empty, '\n');
 	}
@@ -111,6 +106,7 @@ void GameState_Play::spawnPlayer()
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
 	m_player->addComponent<CWeapons>(true, true, true);
+	m_player->addComponent<CHealth>(100);
 }
 
 // Fire the current weapon at the cursor
@@ -130,6 +126,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 		bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
 		bullet->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
 		bullet->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
+		bullet->addComponent<CDamage>(m_pistolConfig.DAMAGE);
 	}
 	else if (weapon->current == 2 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
@@ -143,9 +140,10 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
 			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
 			bullet->addComponent<CBoundingBox>(Vec2(m_shotgunConfig.CX, m_shotgunConfig.CY), false, false);
-			bullet->addComponent<CLifeSpan>(m_shotgunConfig.LIFESPAN / 4);
-			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_shotgunConfig.FIRERATE;
+			bullet->addComponent<CLifeSpan>(m_shotgunConfig.LIFESPAN);
+			bullet->addComponent<CDamage>(m_shotgunConfig.DAMAGE);
 		}
+		weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_shotgunConfig.FIRERATE;
 	}
 	else if (weapon->current == 3 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
@@ -156,6 +154,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 		bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
 		bullet->addComponent<CBoundingBox>(Vec2(m_rifleConfig.CX, m_rifleConfig.CY), false, false);
 		bullet->addComponent<CLifeSpan>(m_rifleConfig.LIFESPAN);
+		bullet->addComponent<CDamage>(m_rifleConfig.DAMAGE);
 		weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_rifleConfig.FIRERATE;
 	}
 	else if (weapon->current == 4 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
@@ -228,8 +227,6 @@ void GameState_Play::sMovement()
 }
 
 
-
-
 void GameState_Play::sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
 {
 	float speed = 5.0;
@@ -250,7 +247,7 @@ void GameState_Play::sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_
 void GameState_Play::sSteer()
 {
 	float speed = 2.0;
-	float scale = 0.5;
+	float scale = 0.05;
 
 	for (auto e : m_entityManager.getEntities("Missile"))
 	{
@@ -383,6 +380,7 @@ void GameState_Play::sLifespan()
 				bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("RockTL"), true);
 				bullet->addComponent<CBoundingBox>(Vec2(m_fragConfig.CX, m_fragConfig.CY), false, false);
 				bullet->addComponent<CLifeSpan>(m_fragConfig.LIFESPAN);
+				bullet->addComponent<CDamage>(m_fragConfig.DAMAGE);
 			}
 			e->destroy();
 		}
@@ -533,13 +531,17 @@ void GameState_Play::sCollision()
 			Vec2 bulletOverlap = Physics::GetOverlap(e, bullet);
 			if (bulletOverlap.x > 0 && bulletOverlap.y > 0)
 			{
-				// Instantiate an explosion animation before destroying the NPC entity
-				auto explosion = m_entityManager.addEntity("explosion");
-				explosion->addComponent<CTransform>(Vec2(e->getComponent<CTransform>()->pos));
-				explosion->addComponent<CBoundingBox>(Vec2(1, 1), false, false);
-				explosion->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
-				explosion->addComponent<CLifeSpan>(2000);
-				e->destroy();
+				e->getComponent<CHealth>()->currentHP -= bullet->getComponent<CDamage>()->damage;
+				if (e->getComponent<CHealth>()->currentHP <= 0)
+				{
+					// Instantiate an explosion animation before destroying the NPC entity
+					auto explosion = m_entityManager.addEntity("explosion");
+					explosion->addComponent<CTransform>(Vec2(e->getComponent<CTransform>()->pos));
+					explosion->addComponent<CBoundingBox>(Vec2(1, 1), false, false);
+					explosion->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
+					explosion->addComponent<CLifeSpan>(2000);
+					e->destroy();
+				}
 				bullet->destroy();
 			}
 		}

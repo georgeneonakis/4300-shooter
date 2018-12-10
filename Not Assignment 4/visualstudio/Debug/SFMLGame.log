@@ -1,2 +1,8 @@
-﻿  GameState_Play.cpp
+﻿  EntityManager.cpp
+  GameEngine.cpp
+  GameState_Menu.cpp
+  GameState_Play.cpp
+c:\users\george\documents\work\4300\project\not assignment 4\src\gamestate_play.cpp(250): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Physics.cpp
+  Generating Code...
   SFMLGame.vcxproj -> C:\Users\George\Documents\Work\4300\Project\Not Assignment 4\visualstudio\../bin/SFMLGame_d.exe
