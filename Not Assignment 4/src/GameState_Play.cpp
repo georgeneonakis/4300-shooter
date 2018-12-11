@@ -862,7 +862,7 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::T:       { m_drawTextures = !m_drawTextures; break; }
                 case sf::Keyboard::F:       { m_drawCollision = !m_drawCollision; break; }
                 case sf::Keyboard::P:       { setPaused(!m_paused); break; }
-				case sf::Keyboard::R:		{startreload(); }
+				case sf::Keyboard::R:		{startreload(); break; }
 				case sf::Keyboard::Num1:	{ m_player->getComponent<CWeapons>()->current = 1; break;}
 				case sf::Keyboard::Num2: 
 				{
