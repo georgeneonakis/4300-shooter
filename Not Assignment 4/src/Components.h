@@ -113,11 +113,18 @@ class CWeapons : public Component
 public:
 	sf::Clock clock;
 	int nextFire = 0;
+	int currtime = 0;
+	bool startreload = false;
 	bool hasTwo = false;
 	bool hasThree = false;
 	bool hasFour = false;
 	bool canShoot = true;
 	int current = 1;
+	int pistol_ammo = 20;
+	int shotgun_ammo = 10;
+	int rifle_ammo = 40;
+	int launcher_ammo = 5;
+
 	CWeapons(bool two, bool three, bool four)
 		: hasTwo(two), hasThree(three), hasFour(four) {}
 };

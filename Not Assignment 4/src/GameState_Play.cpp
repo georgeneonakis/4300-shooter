@@ -7,7 +7,6 @@
 #include <iostream>
 
 
-//This comment is a test to verify that my push worked. 
 
 GameState_Play::GameState_Play(GameEngine & game, const std::string & levelPath)
     : GameState(game)
@@ -77,19 +76,19 @@ void GameState_Play::loadLevel(const std::string & filename)
 		}
 		else if (start == "Pistol")
 		{
-			fin >> m_pistolConfig.CX >> m_pistolConfig.CY >> m_pistolConfig.SPEED >> m_pistolConfig.LIFESPAN >> m_pistolConfig.DAMAGE;
+			fin >> m_pistolConfig.CX >> m_pistolConfig.CY >> m_pistolConfig.SPEED >> m_pistolConfig.LIFESPAN >> m_pistolConfig.DAMAGE >> m_pistolConfig.AMMO;
 		}
 		else if (start == "Shotgun")
 		{
-			fin >> m_shotgunConfig.CX >> m_shotgunConfig.CY >> m_shotgunConfig.SPEED >> m_shotgunConfig.LIFESPAN >> m_shotgunConfig.FIRERATE >> m_shotgunConfig.DAMAGE;
+			fin >> m_shotgunConfig.CX >> m_shotgunConfig.CY >> m_shotgunConfig.SPEED >> m_shotgunConfig.LIFESPAN >> m_shotgunConfig.FIRERATE >> m_shotgunConfig.DAMAGE >> m_shotgunConfig.AMMO;
 		}
 		else if (start == "Rifle")
 		{
-			fin >> m_rifleConfig.CX >> m_rifleConfig.CY >> m_rifleConfig.SPEED >> m_rifleConfig.LIFESPAN >> m_rifleConfig.FIRERATE >> m_rifleConfig.DAMAGE;
+			fin >> m_rifleConfig.CX >> m_rifleConfig.CY >> m_rifleConfig.SPEED >> m_rifleConfig.LIFESPAN >> m_rifleConfig.FIRERATE >> m_rifleConfig.DAMAGE >> m_rifleConfig.AMMO;
 		}
 		else if (start == "Launcher")
 		{
-			fin >> m_launcherConfig.CX >> m_launcherConfig.CY >> m_launcherConfig.SPEED >> m_launcherConfig.LIFESPAN >> m_launcherConfig.FIRERATE;
+			fin >> m_launcherConfig.CX >> m_launcherConfig.CY >> m_launcherConfig.SPEED >> m_launcherConfig.LIFESPAN >> m_launcherConfig.FIRERATE >> m_launcherConfig.AMMO;
 		}
 		else if (start == "Frag")
 		{
@@ -110,6 +109,7 @@ void GameState_Play::spawnPlayer()
     m_player->addComponent<CInput>();
 	m_player->addComponent<CWeapons>(true, true, true);
 	m_player->addComponent<CHealth>(100);
+	startreload();
 }
 
 // Fire the current weapon at the cursor
@@ -120,58 +120,122 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 	Vec2 difference = target - entity->getComponent<CTransform>()->pos;
 	float distance = target.dist(entity->getComponent<CTransform>()->pos);
 	Vec2 normal = difference / distance;
-	if (weapon->current == 1 && weapon->canShoot)
+
+	std::cout << m_player->getComponent<CWeapons>()->pistol_ammo << " " << m_player->getComponent<CWeapons>()->shotgun_ammo << " " << m_player->getComponent<CWeapons>()->rifle_ammo << " " << m_player->getComponent<CWeapons>()->launcher_ammo << " \n";
+	if (weapon->current == 1 && weapon->canShoot && m_player->getComponent<CWeapons>()->startreload == false)
 	{
-		auto bullet = m_entityManager.addEntity("Bullet");
-		// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
-		bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_pistolConfig.SPEED * normal.x, m_pistolConfig.SPEED * normal.y),
-			Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-		bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-		bullet->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
-		bullet->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
-		bullet->addComponent<CDamage>(m_pistolConfig.DAMAGE);
+		if(m_player->getComponent<CWeapons>()->pistol_ammo > 0)
+		{
+			m_player->getComponent<CWeapons>()->pistol_ammo--;
+			auto bullet = m_entityManager.addEntity("Bullet");
+			// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
+			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_pistolConfig.SPEED * normal.x, m_pistolConfig.SPEED * normal.y),
+				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+			bullet->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
+			bullet->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
+			bullet->addComponent<CDamage>(m_pistolConfig.DAMAGE);
+		}
+		else
+		{
+			startreload();
+		}
 	}
 	else if (weapon->current == 2 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
 		int theta = atan2(normal.y, normal.x) * 180 / 3.14159;
-		for (int i = -16; i <= 16; i += 4)
+		if (m_player->getComponent<CWeapons>()->shotgun_ammo > 0 && m_player->getComponent<CWeapons>()->startreload == false)
 		{
-			int newTheta = theta + i;
-			Vec2 newNormal = Vec2(cos(newTheta * 3.14159 / 180), sin(newTheta * 3.14159 / 180));
-			auto bullet = m_entityManager.addEntity("Bullet");
-			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_shotgunConfig.SPEED * newNormal.x, m_shotgunConfig.SPEED * newNormal.y),
-				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-			bullet->addComponent<CBoundingBox>(Vec2(m_shotgunConfig.CX, m_shotgunConfig.CY), false, false);
-			bullet->addComponent<CLifeSpan>(m_shotgunConfig.LIFESPAN);
-			bullet->addComponent<CDamage>(m_shotgunConfig.DAMAGE);
+			m_player->getComponent<CWeapons>()->shotgun_ammo--;
+			for (int i = -16; i <= 16; i += 4)
+			{
+				int newTheta = theta + i;
+				Vec2 newNormal = Vec2(cos(newTheta * 3.14159 / 180), sin(newTheta * 3.14159 / 180));
+				auto bullet = m_entityManager.addEntity("Bullet");
+				bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_shotgunConfig.SPEED * newNormal.x, m_shotgunConfig.SPEED * newNormal.y),
+					Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+				bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+				bullet->addComponent<CBoundingBox>(Vec2(m_shotgunConfig.CX, m_shotgunConfig.CY), false, false);
+				bullet->addComponent<CLifeSpan>(m_shotgunConfig.LIFESPAN);
+				bullet->addComponent<CDamage>(m_shotgunConfig.DAMAGE);
+			}
+			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_shotgunConfig.FIRERATE;
 		}
-		weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_shotgunConfig.FIRERATE;
+
+		else
+		{
+			startreload();
+		}
 	}
 	else if (weapon->current == 3 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
-		auto bullet = m_entityManager.addEntity("Bullet");
-		// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
-		bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_rifleConfig.SPEED * normal.x, m_rifleConfig.SPEED * normal.y),
-			Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-		bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-		bullet->addComponent<CBoundingBox>(Vec2(m_rifleConfig.CX, m_rifleConfig.CY), false, false);
-		bullet->addComponent<CLifeSpan>(m_rifleConfig.LIFESPAN);
-		bullet->addComponent<CDamage>(m_rifleConfig.DAMAGE);
-		weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_rifleConfig.FIRERATE;
+
+		if (m_player->getComponent<CWeapons>()->rifle_ammo>0 && m_player->getComponent<CWeapons>()->startreload == false)
+		{
+			m_player->getComponent<CWeapons>()->rifle_ammo--;
+			auto bullet = m_entityManager.addEntity("Bullet");
+			// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
+			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_rifleConfig.SPEED * normal.x, m_rifleConfig.SPEED * normal.y),
+				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+			bullet->addComponent<CBoundingBox>(Vec2(m_rifleConfig.CX, m_rifleConfig.CY), false, false);
+			bullet->addComponent<CLifeSpan>(m_rifleConfig.LIFESPAN);
+			bullet->addComponent<CDamage>(m_rifleConfig.DAMAGE);
+			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_rifleConfig.FIRERATE;
+		}
+		else
+		{
+			startreload();
+		}
 	}
 	else if (weapon->current == 4 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
-		auto grenade = m_entityManager.addEntity("Grenade");
-		grenade->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_launcherConfig.SPEED * normal.x, m_launcherConfig.SPEED * normal.y),
-			Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-		grenade->addComponent<CAnimation>(m_game.getAssets().getAnimation("RockTM"), true);
-		grenade->addComponent<CBoundingBox>(Vec2(m_launcherConfig.CX, m_launcherConfig.CY), false, false);
-		grenade->addComponent<CLifeSpan>(m_launcherConfig.LIFESPAN);
-		weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_launcherConfig.FIRERATE;
+		if (m_player->getComponent<CWeapons>()->launcher_ammo > 0 && m_player->getComponent<CWeapons>()->startreload == false)
+		{
+			m_player->getComponent<CWeapons>()->launcher_ammo--;
+			auto grenade = m_entityManager.addEntity("Grenade");
+			grenade->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_launcherConfig.SPEED * normal.x, m_launcherConfig.SPEED * normal.y),
+				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
+			grenade->addComponent<CAnimation>(m_game.getAssets().getAnimation("RockTM"), true);
+			grenade->addComponent<CBoundingBox>(Vec2(m_launcherConfig.CX, m_launcherConfig.CY), false, false);
+			grenade->addComponent<CLifeSpan>(m_launcherConfig.LIFESPAN);
+			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_launcherConfig.FIRERATE;
+		}
+
+		else
+		{
+			startreload();
+		}
 	}
 }
 
+
+void GameState_Play::startreload() 
+{
+
+	if (m_player->getComponent<CWeapons>()->startreload == false) 
+	{
+		m_player->getComponent<CWeapons>()->currtime = m_player->getComponent<CWeapons>()->clock.getElapsedTime().asMilliseconds();
+		m_player->getComponent<CWeapons>()->startreload = true;
+	}
+
+}
+
+
+void GameState_Play::endreload()
+{
+	int check = m_player->getComponent<CWeapons>()->currtime;
+	//	std::cout << m_player->getComponent<CWeapons>()->clock.getElapsedTime().asMilliseconds() - check << "\n";
+
+	if (m_player->getComponent<CWeapons>()->clock.getElapsedTime().asMilliseconds() > check + 2000 && m_player->getComponent<CWeapons>()->startreload)
+	{
+		m_player->getComponent<CWeapons>()->startreload = false;
+		m_player->getComponent<CWeapons>()->pistol_ammo = m_pistolConfig.AMMO;
+		m_player->getComponent<CWeapons>()->shotgun_ammo = m_shotgunConfig.AMMO;
+		m_player->getComponent<CWeapons>()->rifle_ammo = m_rifleConfig.AMMO;
+		m_player->getComponent<CWeapons>()->launcher_ammo = m_launcherConfig.AMMO;
+	}
+}
 // Game loop
 void GameState_Play::update()
 {
@@ -185,6 +249,7 @@ void GameState_Play::update()
         sCollision();
         sAnimation();
 		sSteer();
+		endreload();
     }
 
     sUserInput();
@@ -595,9 +660,10 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::S:       { pInput->down = true; break; }
                 case sf::Keyboard::D:       { pInput->right = true; break; }
                 case sf::Keyboard::Z:       { init(m_levelPath); break; }
-                case sf::Keyboard::R:       { m_drawTextures = !m_drawTextures; break; }
+                case sf::Keyboard::T:       { m_drawTextures = !m_drawTextures; break; }
                 case sf::Keyboard::F:       { m_drawCollision = !m_drawCollision; break; }
                 case sf::Keyboard::P:       { setPaused(!m_paused); break; }
+				case sf::Keyboard::R:		{startreload(); }
 				case sf::Keyboard::Num1:	{ m_player->getComponent<CWeapons>()->current = 1; break;}
 				case sf::Keyboard::Num2: 
 				{
@@ -725,3 +791,4 @@ void GameState_Play::sRender()
 
     m_game.window().display();
 }
+

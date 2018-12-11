@@ -15,7 +15,7 @@ struct PlayerConfig
 
 struct WeaponConfig
 {
-	float CX, CY, SPEED, LIFESPAN, FIRERATE, DAMAGE;
+	float CX, CY, SPEED, LIFESPAN, FIRERATE, DAMAGE, AMMO;
 };
 
 class GameState_Play : public GameState
@@ -46,6 +46,8 @@ protected:
     void spawnPlayer();
     void fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & target);
 	void sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim);
+	void startreload();
+	void endreload();
 
 	void sSteer();
 
