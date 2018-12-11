@@ -40,6 +40,33 @@ void GameState_Play::loadLevel(const std::string & filename)
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
 		}
+
+		else if (start == "Spike")
+		{
+			auto block = m_entityManager.addEntity("Spike");
+			std::string name,aiType;
+			float rx, ry, tx, ty, bm, bv, speed;
+			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed;
+
+			block->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+
+			int n;
+			std::vector<Vec2> positions;
+			fin >> n;
+
+			for (int i = 0; i < n; i++)
+			{
+				int xi, yi;
+				fin >> xi >> yi;
+				positions.push_back(Vec2(xi * 64 + m_windowX * rx, yi * 64 + m_windowY * ry));
+			}
+			block->addComponent<CPatrol>(positions, speed);
+
+
+		}
+
 		else if (start == "NPC")
 		{
 			auto npc = m_entityManager.addEntity("NPC");
@@ -341,6 +368,29 @@ sf::Clock clock2;
 // Generate AI behavior
 void GameState_Play::sAI()
 {
+
+	for (auto e : m_entityManager.getEntities("Spike"))
+	{
+
+		// Patrol behavior
+		if (e->hasComponent<CPatrol>())
+		{
+			auto patrol = e->getComponent<CPatrol>();
+			// Update next position if close enough to target
+			if (e->getComponent<CTransform>()->pos.dist(patrol->positions[patrol->currentPosition]) < 5.0)
+			{
+				patrol->currentPosition = (patrol->currentPosition + 1) % patrol->positions.size();
+			}
+			Vec2 nextPosition = patrol->positions[patrol->currentPosition];
+			// Move toward next position
+			Vec2 difference = nextPosition - e->getComponent<CTransform>()->pos;
+			float distance = nextPosition.dist(e->getComponent<CTransform>()->pos);
+			difference /= distance;
+			difference *= patrol->speed;
+			e->getComponent<CTransform>()->speed = difference;
+		}
+	}
+
 	for (auto e : m_entityManager.getEntities("NPC"))
 	{
 
@@ -405,11 +455,7 @@ void GameState_Play::sAI()
 				float distance = m_player->getComponent<CTransform>()->pos.dist(e->getComponent<CTransform>()->pos);
 				difference /= distance;
 				difference *= follow->speed;
-				e->getComponent<CTransform>()->speed = difference;
-
-
-
-				
+				e->getComponent<CTransform>()->speed = difference;				
 			}
 		}
 	}
@@ -584,6 +630,135 @@ void GameState_Play::sCollision()
 			}
 		}
 	}
+
+	for (auto e : m_entityManager.getEntities("Spike"))
+	{
+		if (!e->getComponent<CBoundingBox>()->blockMove)
+		{
+			continue;
+		}
+		// Check for player collisions with tiles
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			Vec2 prevOverlap = Physics::GetPreviousOverlap(e, m_player);
+			// Player colliding from the side
+			if (prevOverlap.x <= 0 && prevOverlap.y > 0)
+			{
+				// Colliding from the left
+				if (m_player->getComponent<CTransform>()->pos.x < e->getComponent<CTransform>()->pos.x)
+				{
+					m_player->getComponent<CTransform>()->pos.x -= playerOverlap.x;
+				}
+				// Colliding from the right
+				else
+				{
+					m_player->getComponent<CTransform>()->pos.x += playerOverlap.x;
+				}
+			}
+			// Player colliding from the top or bottom
+			else
+			{
+				// Colliding from the top
+				if (m_player->getComponent<CTransform>()->pos.y < e->getComponent<CTransform>()->pos.y)
+				{
+					m_player->getComponent<CTransform>()->pos.y -= playerOverlap.y;
+				}
+				// Colliding from the bottom
+				else
+				{
+					m_player->getComponent<CTransform>()->pos.y += playerOverlap.y;
+				}
+			}
+		}
+		// Check for NPC collisions with tiles
+		for (auto npc : m_entityManager.getEntities("NPC"))
+		{
+			Vec2 npcOverlap = Physics::GetOverlap(e, npc);
+			if (npcOverlap.x > 0 && npcOverlap.y > 0)
+			{
+				Vec2 prevOverlap = Physics::GetPreviousOverlap(e, npc);
+				// NPC colliding from the side
+				if (prevOverlap.x <= 0 && prevOverlap.y > 0)
+				{
+					// Colliding from the left 
+					if (npc->getComponent<CTransform>()->pos.x < e->getComponent<CTransform>()->pos.x)
+					{
+						npc->getComponent<CTransform>()->pos.x -= npcOverlap.x;
+					}
+					// Colliding from the right
+					else
+					{
+						npc->getComponent<CTransform>()->pos.x += npcOverlap.x;
+					}
+				}
+				// NPC colliding from the top or bottom
+				else
+				{
+					// Colliding from the top
+					if (npc->getComponent<CTransform>()->pos.y < e->getComponent<CTransform>()->pos.y)
+					{
+						npc->getComponent<CTransform>()->pos.y -= npcOverlap.y;
+					}
+					// Colliding from the bottom
+					else
+					{
+						npc->getComponent<CTransform>()->pos.y += npcOverlap.y;
+					}
+				}
+			}
+		}
+		// Check for bullet collisions with tiles
+		for (auto bullet : m_entityManager.getEntities("Bullet"))
+		{
+			Vec2 bulletOverlap = Physics::GetOverlap(e, bullet);
+			if (bulletOverlap.x > 0 && bulletOverlap.y > 0 && e->getComponent<CBoundingBox>()->blockVision)
+			{
+				bullet->destroy();
+			}
+		}
+		for (auto grenade : m_entityManager.getEntities("Grenade"))
+		{
+			Vec2 grenadeOverlap = Physics::GetOverlap(e, grenade);
+			if (grenadeOverlap.x > 0 && grenadeOverlap.y > 0 && e->getComponent<CBoundingBox>()->blockVision)
+			{
+				Vec2 prevOverlap = Physics::GetPreviousOverlap(e, grenade);
+				// Grenade colliding from the side
+				if (prevOverlap.x <= 0 && prevOverlap.y > 0)
+				{
+					grenade->getComponent<CTransform>()->speed.x *= -1;
+					// Colliding from the left 
+					if (grenade->getComponent<CTransform>()->pos.x < e->getComponent<CTransform>()->pos.x)
+					{
+						grenade->getComponent<CTransform>()->pos.x -= grenadeOverlap.x;
+					}
+					// Colliding from the right
+					else
+					{
+						grenade->getComponent<CTransform>()->pos.x += grenadeOverlap.x;
+					}
+				}
+				// Grenade colliding from the top or bottom
+				else
+				{
+					grenade->getComponent<CTransform>()->speed.y *= -1;
+					// Colliding from the top
+					if (grenade->getComponent<CTransform>()->pos.y < e->getComponent<CTransform>()->pos.y)
+					{
+						grenade->getComponent<CTransform>()->pos.y -= grenadeOverlap.y;
+					}
+					// Colliding from the bottom
+					else
+					{
+						grenade->getComponent<CTransform>()->pos.y += grenadeOverlap.y;
+					}
+				}
+			}
+		}
+	}
+
+
+
 	// Check for collisions with NPCs
 	for (auto e : m_entityManager.getEntities("NPC"))
 	{
