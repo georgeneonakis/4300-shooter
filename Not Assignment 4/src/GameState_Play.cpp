@@ -131,7 +131,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 			// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
 			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_pistolConfig.SPEED * normal.x, m_pistolConfig.SPEED * normal.y),
 				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("P_bullet"), true);
 			bullet->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
 			bullet->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
 			bullet->addComponent<CDamage>(m_pistolConfig.DAMAGE);
@@ -154,7 +154,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 				auto bullet = m_entityManager.addEntity("Bullet");
 				bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_shotgunConfig.SPEED * newNormal.x, m_shotgunConfig.SPEED * newNormal.y),
 					Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-				bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+				bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("S_bullet"), true);
 				bullet->addComponent<CBoundingBox>(Vec2(m_shotgunConfig.CX, m_shotgunConfig.CY), false, false);
 				bullet->addComponent<CLifeSpan>(m_shotgunConfig.LIFESPAN);
 				bullet->addComponent<CDamage>(m_shotgunConfig.DAMAGE);
@@ -177,7 +177,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 			// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
 			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_rifleConfig.SPEED * normal.x, m_rifleConfig.SPEED * normal.y),
 				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
+			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("R_bullet"), true);
 			bullet->addComponent<CBoundingBox>(Vec2(m_rifleConfig.CX, m_rifleConfig.CY), false, false);
 			bullet->addComponent<CLifeSpan>(m_rifleConfig.LIFESPAN);
 			bullet->addComponent<CDamage>(m_rifleConfig.DAMAGE);
@@ -445,7 +445,7 @@ void GameState_Play::sLifespan()
 				auto bullet = m_entityManager.addEntity("Bullet");
 				bullet->addComponent<CTransform>(Vec2(source), Vec2(m_fragConfig.SPEED * normal.x, m_fragConfig.SPEED * normal.y),
 					Vec2(1, 1), -atan2(normal.x, normal.y) * 180 / 3.14159);
-				bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("RockTL"), true);
+				bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("L_bullet"), true);
 				bullet->addComponent<CBoundingBox>(Vec2(m_fragConfig.CX, m_fragConfig.CY), false, false);
 				bullet->addComponent<CLifeSpan>(m_fragConfig.LIFESPAN);
 				bullet->addComponent<CDamage>(m_fragConfig.DAMAGE);

@@ -32,6 +32,17 @@ Texture   TexBlack      images/tloz/tile_black.png
 Texture   TexTektite    images/tloz/tektite.png
 Texture   TexKnight     images/tloz/knight.png
 Texture   TexArrow	images/tloz/item_arrow_right.png
+Texture	  TexWB		images/ours/white_bullet.png
+Texture	  TexRB		images/ours/red_bullet.png
+Texture	  TexGB		images/ours/green_bullet.png
+Texture	  TexBB		images/ours/blue_bullet.png
+Animation P_bullet      TexWB           1    0
+Animation S_bullet      TexRB           1    0
+Animation R_bullet      TexGB           1    0
+Animation L_bullet      TexBB           1    0
+Animation Bush          TexBush         1    0
+Animation Bush          TexBush         1    0
+Animation Bush          TexBush         1    0
 Animation Explosion     TexExplode     48    2 
 Animation RunDown       TexRunDown      2   15   
 Animation RunRight      TexRunRight     2   15    
