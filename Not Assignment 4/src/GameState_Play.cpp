@@ -123,6 +123,33 @@ void GameState_Play::loadLevel(const std::string & filename)
 		{
 			fin >> m_fragConfig.CX >> m_fragConfig.CY >> m_fragConfig.SPEED >> m_fragConfig.LIFESPAN >> m_fragConfig.FIRERATE >> m_fragConfig.DAMAGE;
 		}
+
+		else if (start == "HPot")
+		{
+			auto pot = m_entityManager.addEntity("HealthPot");
+			std::string name;
+			int x, y, bm, bv;
+
+			fin >> name >> x >> y >> bm >> bv;
+
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			pot->addComponent<CTransform>(Vec2(x, y));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+		}
+
+
+		else if (start == "SPot")
+		{
+			auto pot = m_entityManager.addEntity("ShieldPot");
+			std::string name;
+			int x, y, bm, bv;
+
+			fin >> name >> x >> y >> bm >> bv;
+
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			pot->addComponent<CTransform>(Vec2(x, y));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+		}
 		getline(fin, empty, '\n');
 	}
     spawnPlayer();
@@ -138,6 +165,8 @@ void GameState_Play::spawnPlayer()
     m_player->addComponent<CInput>();
 	m_player->addComponent<CWeapons>(true, true, true);
 	m_player->addComponent<CHealth>(100);
+	m_player->addComponent<CShield>(0);
+	m_player->addComponent<CInventory>();
 	startreload();
 }
 
@@ -658,6 +687,29 @@ void GameState_Play::sCollision()
 		}
 	}
 
+	for (auto e : m_entityManager.getEntities("HealthPot"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			m_player->getComponent<CInventory>()->hasHPot = true;
+			m_player->getComponent<CInventory>()->hPotCount++;
+		}
+		e->destroy();
+	}
+
+	for (auto e : m_entityManager.getEntities("ShieldPot"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			m_player->getComponent<CInventory>()->hasSPot = true;
+			m_player->getComponent<CInventory>()->sPotCount++;
+		}
+		e->destroy();
+	}
+
+
 	for (auto e : m_entityManager.getEntities("Spike"))
 	{
 		if (!e->getComponent<CBoundingBox>()->blockMove)
@@ -829,6 +881,27 @@ void GameState_Play::sAnimation()
 	}
 }
 
+void GameState_Play::sInventory()
+{
+	if (hPot && m_player->getComponent<CInventory>()->hPotCount >= 1)
+	{
+		m_player->getComponent<CHealth>()->currentHP += 25;
+		if (m_player->getComponent<CHealth>()->currentHP > m_player->getComponent<CHealth>()->maxHP)
+		{
+			m_player->getComponent<CHealth>()->currentHP = m_player->getComponent<CHealth>()->maxHP;
+		}
+		m_player->getComponent<CInventory>()->hPotCount--;
+		hPot = false;
+	}
+
+	if (sPot && m_player->getComponent<CInventory>()->sPotCount >= 1)
+	{
+		m_player->getComponent<CShield>()->currentShield += 25;
+		m_player->getComponent<CInventory>()->sPotCount--;
+		sPot = false;
+	}
+}
+
 // Receive user input
 void GameState_Play::sUserInput()
 {
@@ -863,6 +936,21 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::F:       { m_drawCollision = !m_drawCollision; break; }
                 case sf::Keyboard::P:       { setPaused(!m_paused); break; }
 				case sf::Keyboard::R:		{startreload(); break; }
+				case sf::Keyboard::Tab: { m_showInventory = !m_showInventory; setPaused(!m_paused); break; }
+				case sf::Keyboard::J:
+				{
+					if (m_player->getComponent<CInventory>()->hasHPot)
+					{
+						hPot = true;
+					}
+				}
+				case sf::Keyboard::K:
+				{
+					if (m_player->getComponent<CInventory>()->hasSPot)
+					{
+						sPot = true;
+					}
+				}
 				case sf::Keyboard::Num1:	{ m_player->getComponent<CWeapons>()->current = 1; break;}
 				case sf::Keyboard::Num2: 
 				{
@@ -987,6 +1075,22 @@ void GameState_Play::sRender()
             }
         }
     }
+
+	if (m_showInventory)
+	{
+		int items = 4;
+		auto window = m_game.window().getSize();
+		int invX = window.x * 0.7;
+
+		sf::RectangleShape rect;
+		rect.setSize(sf::Vector2f(window.x * 0.3 - 5, window.y));
+		rect.setPosition(window.x * 0.7, -20);
+		rect.setFillColor(sf::Color::Black);
+		rect.setOutlineThickness(5);
+
+		sf::RectangleShape slots;
+		m_game.window().draw(rect);
+	}
 
     m_game.window().display();
 }

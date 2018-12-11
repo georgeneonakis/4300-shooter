@@ -150,3 +150,22 @@ public:
 	CDamage(int amount, int rate)
 		: damage(amount), fireRate(rate) {}
 };
+
+class CShield : public Component
+{
+public:
+	int maxShield;
+	int currentShield;
+	CShield(int shield)
+		: maxShield(shield), currentShield(shield) {}
+};
+
+class CInventory : public Component
+{
+public:
+	bool hasHPot;
+	bool hasSPot;
+	int hPotCount;
+	int sPotCount;
+	CInventory() {}
+};
