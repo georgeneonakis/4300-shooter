@@ -36,7 +36,9 @@ Texture	  TexWB		images/ours/white_bullet.png
 Texture	  TexRB		images/ours/red_bullet.png
 Texture	  TexGB		images/ours/green_bullet.png
 Texture	  TexBB		images/ours/blue_bullet.png
+Texture	  TexFR		images/ours/frag.png
 Texture   TexSB		images/ours/allsidespikes.png
+Animation Frag		TexFR		3    12
 Animation SpikeBlock    TexSB		1    0
 Animation P_bullet      TexWB           1    0
 Animation S_bullet      TexRB           1    0

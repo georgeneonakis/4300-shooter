@@ -225,7 +225,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 			auto grenade = m_entityManager.addEntity("Grenade");
 			grenade->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_launcherConfig.SPEED * normal.x, m_launcherConfig.SPEED * normal.y),
 				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
-			grenade->addComponent<CAnimation>(m_game.getAssets().getAnimation("RockTM"), true);
+			grenade->addComponent<CAnimation>(m_game.getAssets().getAnimation("Frag"), true);
 			grenade->addComponent<CBoundingBox>(Vec2(m_launcherConfig.CX, m_launcherConfig.CY), false, false);
 			grenade->addComponent<CLifeSpan>(m_launcherConfig.LIFESPAN);
 			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_launcherConfig.FIRERATE;
