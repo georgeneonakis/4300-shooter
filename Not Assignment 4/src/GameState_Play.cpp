@@ -45,12 +45,13 @@ void GameState_Play::loadLevel(const std::string & filename)
 		{
 			auto block = m_entityManager.addEntity("Spike");
 			std::string name,aiType;
-			float rx, ry, tx, ty, bm, bv, speed;
-			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed;
+			float rx, ry, tx, ty, bm, bv, speed, damage;
+			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed >> damage;
 
 			block->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+			block->addComponent<CDamage>(damage, 500);
 
 			int n;
 			std::vector<Vec2> positions;
@@ -71,13 +72,14 @@ void GameState_Play::loadLevel(const std::string & filename)
 		{
 			auto npc = m_entityManager.addEntity("NPC");
 			std::string name, aiType;
-			float rx, ry, tx, ty, bm, bv, speed;
-			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed;
+			float rx, ry, tx, ty, bm, bv, speed, damage;
+			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed >> damage;
 
 			npc->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			npc->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			npc->addComponent<CBoundingBox>(npc->getComponent<CAnimation>()->animation.getSize(), bm, bv);
 			npc->addComponent<CHealth>(100);
+			npc->addComponent<CDamage>(damage, 500);
 			if (aiType == "Follow")
 			{
 				npc->addComponent<CFollowPlayer>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64), speed);
@@ -263,6 +265,31 @@ void GameState_Play::endreload()
 		m_player->getComponent<CWeapons>()->launcher_ammo = m_launcherConfig.AMMO;
 	}
 }
+
+void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_ptr<Entity> target)
+{
+	auto damage = source->getComponent<CDamage>();
+	auto health = target->getComponent<CHealth>();
+	if (damage->clock.getElapsedTime().asMilliseconds() >= damage->nextFire)
+	{
+		health->currentHP -= damage->damage;
+		if (health->currentHP <= 0)
+		{
+			if (target->tag() == "player")
+			{
+				m_game.popState();
+				return;
+			}
+			else
+			{
+				target->destroy();
+			}
+		}
+		damage->nextFire = damage->clock.getElapsedTime().asMilliseconds() + damage->fireRate;
+	}
+}
+
+
 // Game loop
 void GameState_Play::update()
 {
@@ -641,6 +668,7 @@ void GameState_Play::sCollision()
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
+			inflictDamage(e, m_player);
 			Vec2 prevOverlap = Physics::GetPreviousOverlap(e, m_player);
 			// Player colliding from the side
 			if (prevOverlap.x <= 0 && prevOverlap.y > 0)
@@ -677,6 +705,7 @@ void GameState_Play::sCollision()
 			Vec2 npcOverlap = Physics::GetOverlap(e, npc);
 			if (npcOverlap.x > 0 && npcOverlap.y > 0)
 			{
+				inflictDamage(e, npc);
 				Vec2 prevOverlap = Physics::GetPreviousOverlap(e, npc);
 				// NPC colliding from the side
 				if (prevOverlap.x <= 0 && prevOverlap.y > 0)
@@ -757,24 +786,20 @@ void GameState_Play::sCollision()
 		}
 	}
 
-
-
 	// Check for collisions with NPCs
 	for (auto e : m_entityManager.getEntities("NPC"))
 	{
-		// Respawn the player if they collide with an NPC
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
-			m_player->getComponent<CTransform>()->pos = Vec2(m_playerConfig.X, m_playerConfig.Y);
+			inflictDamage(e, m_player);
 		}
-		// Destroy the NPC if it collides with a bullet
 		for (auto bullet : m_entityManager.getEntities("Bullet"))
 		{
 			Vec2 bulletOverlap = Physics::GetOverlap(e, bullet);
 			if (bulletOverlap.x > 0 && bulletOverlap.y > 0)
 			{
-				e->getComponent<CHealth>()->currentHP -= bullet->getComponent<CDamage>()->damage;
+				inflictDamage(bullet, e);
 				if (e->getComponent<CHealth>()->currentHP <= 0)
 				{
 					// Instantiate an explosion animation before destroying the NPC entity
@@ -783,7 +808,6 @@ void GameState_Play::sCollision()
 					explosion->addComponent<CBoundingBox>(Vec2(1, 1), false, false);
 					explosion->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
 					explosion->addComponent<CLifeSpan>(2000);
-					e->destroy();
 				}
 				bullet->destroy();
 			}

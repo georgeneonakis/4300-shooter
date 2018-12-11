@@ -1,3 +1,3 @@
 ﻿  GameState_Play.cpp
-c:\users\kishoto\documents\github\4300-shooter\not assignment 4\src\gamestate_play.cpp(345): warning C4305: 'initializing': truncation from 'double' to 'float'
-  SFMLGame.vcxproj -> C:\Users\Kishoto\Documents\GitHub\4300-shooter\Not Assignment 4\visualstudio\../bin/SFMLGame_d.exe
+c:\users\george\documents\work\4300\project\not assignment 4\src\gamestate_play.cpp(372): warning C4305: 'initializing': truncation from 'double' to 'float'
+  SFMLGame.vcxproj -> C:\Users\George\Documents\Work\4300\Project\Not Assignment 4\visualstudio\../bin/SFMLGame_d.exe

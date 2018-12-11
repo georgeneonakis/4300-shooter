@@ -141,7 +141,12 @@ public:
 class CDamage : public Component
 {
 public:
+	sf::Clock clock;
+	int nextFire = 0;
+	int fireRate = 0;
 	int damage;
 	CDamage(int amount)
 		: damage(amount) {}
+	CDamage(int amount, int rate)
+		: damage(amount), fireRate(rate) {}
 };
