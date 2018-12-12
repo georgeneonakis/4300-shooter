@@ -101,7 +101,7 @@ void GameState_Play::loadLevel(const std::string & filename)
 		}
 		else if (start == "Player")
 		{
-			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH;
+			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH >> m_playerConfig.DTIME >> m_playerConfig.DCOOLDOWN >> m_playerConfig.DSPEED;
 		}
 		else if (start == "Pistol")
 		{
@@ -167,7 +167,7 @@ void GameState_Play::spawnPlayer()
 	m_player->addComponent<CHealth>(100);
 	m_player->addComponent<CShield>(0);
 	m_player->addComponent<CInventory>();
-	m_player->addComponent<CDash>(300, 3000, 2);
+	m_player->addComponent<CDash>(m_playerConfig.DTIME, m_playerConfig.DCOOLDOWN, m_playerConfig.DSPEED);
 	startreload();
 }
 

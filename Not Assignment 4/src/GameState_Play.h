@@ -10,7 +10,7 @@
 
 struct PlayerConfig 
 { 
-	float X, Y, CX, CY, SPEED, HEALTH;
+	float X, Y, CX, CY, SPEED, HEALTH, DSPEED, DTIME, DCOOLDOWN;
 };
 
 struct WeaponConfig
