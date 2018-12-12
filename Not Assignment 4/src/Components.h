@@ -169,3 +169,17 @@ public:
 	int sPotCount;
 	CInventory() {}
 };
+
+class CDash : public Component
+{
+public:
+	sf::Clock clock;
+	int dashSpeed;
+	bool isDashing = false;
+	bool canDash = true;
+	int dashTimer;
+	int dashDuration;
+	int dashCooldown;
+	CDash(int duration, int cooldown, int speed)
+		: dashDuration(duration), dashCooldown(cooldown), dashSpeed(speed) {}
+};

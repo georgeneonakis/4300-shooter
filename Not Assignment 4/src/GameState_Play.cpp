@@ -167,6 +167,7 @@ void GameState_Play::spawnPlayer()
 	m_player->addComponent<CHealth>(100);
 	m_player->addComponent<CShield>(0);
 	m_player->addComponent<CInventory>();
+	m_player->addComponent<CDash>(300, 3000, 2);
 	startreload();
 }
 
@@ -344,23 +345,36 @@ void GameState_Play::sMovement()
 {
 	auto pInput = m_player->getComponent<CInput>();
 	auto pTransform = m_player->getComponent<CTransform>();
-	pTransform->speed = Vec2(0, 0);
-	// Determine player's speed based on input
-	if (pInput->up)
+	auto pDash = m_player->getComponent<CDash>();
+	if (!(pDash->isDashing))
 	{
-		pTransform->speed.y -= m_playerConfig.SPEED;
+		if (!(pDash->canDash) && pDash->clock.getElapsedTime().asMilliseconds() >= pDash->dashTimer)
+		{
+			pDash->canDash = true;
+		}
+		pTransform->speed = Vec2(0, 0);
+		// Determine player's speed based on input
+		if (pInput->up)
+		{
+			pTransform->speed.y -= m_playerConfig.SPEED;
+		}
+		if (pInput->down)
+		{
+			pTransform->speed.y += m_playerConfig.SPEED;
+		}
+		if (pInput->left)
+		{
+			pTransform->speed.x -= m_playerConfig.SPEED;
+		}
+		if (pInput->right)
+		{
+			pTransform->speed.x += m_playerConfig.SPEED;
+		}
 	}
-	if (pInput->down)
+	else if (pDash->clock.getElapsedTime().asMilliseconds() >= pDash->dashTimer)
 	{
-		pTransform->speed.y += m_playerConfig.SPEED;
-	}
-	if (pInput->left)
-	{
-		pTransform->speed.x -= m_playerConfig.SPEED;
-	}
-	if (pInput->right)
-	{
-		pTransform->speed.x += m_playerConfig.SPEED;
+		pDash->isDashing = false;
+		pDash->dashTimer = pDash->clock.getElapsedTime().asMilliseconds() + pDash->dashCooldown;
 	}
 
 	// Rotate player to face cursor
@@ -936,6 +950,18 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::F:       { m_drawCollision = !m_drawCollision; break; }
                 case sf::Keyboard::P:       { setPaused(!m_paused); break; }
 				case sf::Keyboard::R:		{startreload(); break; }
+				case sf::Keyboard::LShift:
+				{
+					auto dash = m_player->getComponent<CDash>();
+					if (dash->canDash)
+					{
+						dash->isDashing = true;
+						dash->canDash = false;
+						dash->dashTimer = dash->clock.getElapsedTime().asMilliseconds() + dash->dashDuration;
+						m_player->getComponent<CTransform>()->speed *= dash->dashSpeed;
+					}
+					break;
+				}
 				case sf::Keyboard::Tab: { m_showInventory = !m_showInventory; setPaused(!m_paused); break; }
 				case sf::Keyboard::J:
 				{
