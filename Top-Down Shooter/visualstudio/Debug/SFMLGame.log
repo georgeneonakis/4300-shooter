@@ -1,5 +1,15 @@
-﻿  GameState_Play.cpp
+﻿  Entity.cpp
+  EntityManager.cpp
+  GameEngine.cpp
+  GameState_Menu.cpp
+  GameState_Play.cpp
 c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(205): warning C4996: 'sf::Text::setColor': was declared deprecated
   c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
-c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(493): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(208): warning C4996: 'sf::Text::setColor': was declared deprecated
+  c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(211): warning C4996: 'sf::Text::setColor': was declared deprecated
+  c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(512): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Physics.cpp
+  Generating Code...
   SFMLGame.vcxproj -> C:\Users\George\Documents\Work\4300\Project\Top-Down Shooter\visualstudio\../bin/SFMLGame_d.exe

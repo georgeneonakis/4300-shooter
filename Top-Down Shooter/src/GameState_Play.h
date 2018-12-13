@@ -28,6 +28,8 @@ protected:
 	std::shared_ptr<Entity> player_aura;
     std::string             m_levelPath;
 	sf::Text				m_playerHealth;
+	sf::Text				m_playerShields;
+	sf::Text				m_playerAmmo;
     PlayerConfig            m_playerConfig;
 	WeaponConfig			m_pistolConfig;
 	WeaponConfig			m_shotgunConfig;

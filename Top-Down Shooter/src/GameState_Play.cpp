@@ -150,7 +150,7 @@ void GameState_Play::loadLevel(const std::string & filename)
 			npc->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			npc->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			npc->addComponent<CBoundingBox>(npc->getComponent<CAnimation>()->animation.getSize(), bm, bv);
-			npc->addComponent<CHealth>(100);
+			npc->addComponent<CHealth>(100, 0);
 			npc->addComponent<CDamage>(damage, 500);
 			if (aiType == "Follow")
 			{
@@ -201,8 +201,15 @@ void GameState_Play::loadLevel(const std::string & filename)
 	}
 
 	m_playerHealth.setFont(m_game.getAssets().getFont("Megaman"));
-	m_playerHealth.setCharacterSize(48);
+	m_playerHealth.setCharacterSize(32);
 	m_playerHealth.setColor(sf::Color::Red);
+	m_playerShields.setFont(m_game.getAssets().getFont("Megaman"));
+	m_playerShields.setCharacterSize(32);
+	m_playerShields.setColor(sf::Color::Blue);
+	m_playerAmmo.setFont(m_game.getAssets().getFont("Megaman"));
+	m_playerAmmo.setCharacterSize(32);
+	m_playerAmmo.setColor(sf::Color::Black);
+
     spawnPlayer();
 }
 
@@ -216,8 +223,7 @@ void GameState_Play::spawnPlayer()
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
 	m_player->addComponent<CWeapons>(false, false, false);
-	m_player->addComponent<CHealth>(100);
-	m_player->addComponent<CShield>(0);
+	m_player->addComponent<CHealth>(m_playerConfig.HEALTH, 100);
 	m_player->addComponent<CAura>(0);
 	m_player->addComponent<CInventory>();
 	m_player->addComponent<CDash>(m_playerConfig.DTIME, m_playerConfig.DCOOLDOWN, m_playerConfig.DSPEED);
@@ -364,6 +370,20 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 	auto health = target->getComponent<CHealth>();
 	if (damage->clock.getElapsedTime().asMilliseconds() >= damage->nextFire)
 	{
+		damage->nextFire = damage->clock.getElapsedTime().asMilliseconds() + damage->fireRate;
+		if (health->currentShield > 0)
+		{
+			if (health->currentShield > damage->damage)
+			{
+				health->currentShield -= damage->damage;
+				return;
+			}
+			else
+			{
+				damage->damage -= health->currentShield;
+				health->currentShield = 0;
+			}
+		}
 		health->currentHP -= damage->damage;
 		if (health->currentHP <= 0)
 		{
@@ -377,7 +397,6 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 				target->destroy();
 			}
 		}
-		damage->nextFire = damage->clock.getElapsedTime().asMilliseconds() + damage->fireRate;
 	}
 }
 
@@ -1070,7 +1089,11 @@ void GameState_Play::sInventory()
 
 	if (sPot && m_player->getComponent<CInventory>()->sPotCount >= 1)
 	{
-		m_player->getComponent<CShield>()->currentShield += 25;
+		m_player->getComponent<CHealth>()->currentShield += 25;
+		if (m_player->getComponent<CHealth>()->currentShield > m_player->getComponent<CHealth>()->maxShield)
+		{
+			m_player->getComponent<CHealth>()->currentShield = m_player->getComponent<CHealth>()->maxShield;
+		}
 		m_player->getComponent<CInventory>()->sPotCount--;
 		sPot = false;
 	}
@@ -1288,9 +1311,39 @@ void GameState_Play::sRender()
 		m_game.window().draw(rect);
 	}
 
-	m_playerHealth.setPosition(m_player->getComponent<CTransform>()->pos.x - 550, m_player->getComponent<CTransform>()->pos.y + 250);
+	m_playerHealth.setPosition(m_player->getComponent<CTransform>()->pos.x - 600, m_player->getComponent<CTransform>()->pos.y + 250);
 	m_playerHealth.setString(std::to_string(m_player->getComponent<CHealth>()->currentHP));
 	m_game.window().draw(m_playerHealth);
+
+	m_playerShields.setPosition(m_player->getComponent<CTransform>()->pos.x - 500, m_player->getComponent<CTransform>()->pos.y + 250);
+	m_playerShields.setString(std::to_string(m_player->getComponent<CHealth>()->currentShield));
+	m_game.window().draw(m_playerShields);
+
+	m_playerAmmo.setPosition(m_player->getComponent<CTransform>()->pos.x - 400, m_player->getComponent<CTransform>()->pos.y + 250);
+	switch (m_player->getComponent<CWeapons>()->current)
+	{
+		case 1:
+		{
+			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->pistol_ammo));
+			break;
+		}
+		case 2:
+		{
+			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->shotgun_ammo));
+			break;
+		}
+		case 3:
+		{
+			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->rifle_ammo));
+			break;
+		}
+		case 4:
+		{
+			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->launcher_ammo));
+			break;
+		}
+	}
+	m_game.window().draw(m_playerAmmo);
 
     m_game.window().display();
 }

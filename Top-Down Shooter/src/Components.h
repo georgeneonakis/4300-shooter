@@ -142,8 +142,10 @@ class CHealth : public Component
 public:
 	int maxHP;
 	int currentHP;
-	CHealth(int hp)
-		: maxHP(hp), currentHP(hp) {}
+	int maxShield;
+	int currentShield = 0;
+	CHealth(int hp, int shield)
+		: maxHP(hp), currentHP(hp), maxShield(shield) {}
 };
 
 class CDamage : public Component
@@ -157,15 +159,6 @@ public:
 		: damage(amount) {}
 	CDamage(int amount, int rate)
 		: damage(amount), fireRate(rate) {}
-};
-
-class CShield : public Component
-{
-public:
-	int maxShield;
-	int currentShield;
-	CShield(int shield)
-		: maxShield(shield), currentShield(shield) {}
 };
 
 class CInventory : public Component
