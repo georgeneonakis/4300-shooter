@@ -50,6 +50,16 @@ Texture   TexRedAura	images/ours/red-aura.png
 Texture   TexGreenAura	images/ours/green-aura.png
 Texture   TexBlueAura	images/ours/blue-aura.png
 Texture   TexNoAura     images/ours/no-aura.png
+Texture	  TexFRW	images/ours/frag_weapon.png
+Texture   TexSGW	images/ours/shotgun_weapon.png
+Texture   TexRFW	images/ours/rifle_weapon.png
+Texture   TexGFloor	images/ours/grey_floor.png
+Texture   TexWall	images/ours/grey_wall.png
+Animation GreyFloor	TexGFloor       1    0
+Animation GreyWall	TexWall		1    0
+Animation ShotgunItem	TexSGW		2    15
+Animation RifleItem	TexRFW		2    15
+Animation FragItem	TexFRW		2    15
 Animation NoAura	TexNoAura	1    0
 Animation RedAura	TexRedAura	1    0
 Animation GreenAura	TexGreenAura	1    0

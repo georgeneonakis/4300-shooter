@@ -48,7 +48,6 @@ void GameState_Play::loadLevel(const std::string & filename)
 			float rx, ry, tx, ty, bm, bv, speed, damage;
 			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed >> damage;
 
-			std::cout << name << "   " << rx << "   " << ry << "   " << tx << "   " << ty << "   " << bm << "   " << bv << "   " << "     We in here\n";
 
 			block->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
@@ -76,8 +75,6 @@ void GameState_Play::loadLevel(const std::string & filename)
 			std::string name;
 			float rx, ry, tx, ty, bm, bv;
 			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv;
-
-			std::cout << name << "   " << rx << "   " << ry << "   " << tx << "   " << ty << "   " << bm << "   " << bv << "   " << "     We in Here\n";
 
 			block->addComponent<CAnimation>(m_game.getAssets().getAnimation("HPot"), true);
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
@@ -436,12 +433,10 @@ void GameState_Play::sMovement()
 
 		if ((pTransform->speed.x != 0 || pTransform->speed.y != 0) && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerM" && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerA")
 		{
-			std::cout << m_player->getComponent<CAnimation>()->animation.getName() << "     Trying\n";
 			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
 		}
 		else if (pTransform->speed.x == 0 && pTransform->speed.y ==0 && m_player->getComponent<CAnimation>()->animation.getName()!= "PlayerA")
 		{
-			std::cout << m_player->getComponent<CAnimation>()->animation.getName() << "     Not Trying\n";
 			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerSt"), true);
 
 		}
@@ -481,11 +476,15 @@ void GameState_Play::sMovement()
 	{
 		e->getComponent<CTransform>()->prevPos = Vec2(e->getComponent<CTransform>()->pos);
 		e->getComponent<CTransform>()->pos += e->getComponent<CTransform>()->speed;
+		if (e->tag() == "player")
+		{
+			player_aura->getComponent<CTransform>()->pos = Vec2(m_player->getComponent<CTransform>()->pos);
+			player_aura->getComponent<CTransform>()->angle = float(m_player->getComponent<CTransform>()->angle);
+			player_aura->getComponent<CTransform>()->scale = Vec2(m_player->getComponent<CTransform>()->scale);
+		}
 	}
 
-	player_aura->getComponent<CTransform>()->pos = Vec2(m_player->getComponent<CTransform>()->pos);
-	player_aura->getComponent<CTransform>()->angle = float(m_player->getComponent<CTransform>()->angle);
-	player_aura->getComponent<CTransform>()->scale = Vec2(m_player->getComponent<CTransform>()->scale);
+
 }
 
 
@@ -1151,6 +1150,7 @@ void GameState_Play::sUserInput()
 					if (m_player->getComponent<CInventory>()->hasHPot)
 					{
 						hPot = true;
+						break;
 					}
 				}
 				case sf::Keyboard::K:
@@ -1158,6 +1158,7 @@ void GameState_Play::sUserInput()
 					if (m_player->getComponent<CInventory>()->hasSPot)
 					{
 						sPot = true;
+						break;
 					}
 				}
 				case sf::Keyboard::Num1:	

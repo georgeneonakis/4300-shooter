@@ -65,9 +65,9 @@ Tile WaterBL -1 0   2  8 1 0
 Tile WaterBM -1 0   3  8 1 0
 Tile WaterBR -1 0   4  8 1 0
 NPC  Tektite -1 0   1  4 0 0 Follow 2 25
-ShotgunPickup Bush 0 0 6 5
-RiflePickup WaterTL 0 0 12 5
-LauncherPickup RockBR 0 0 14 8
+ShotgunPickup ShotgunItem 0 0 6 5
+RiflePickup RifleItem 0 0 12 5
+LauncherPickup FragItem 0 0 14 8
 Player 640 360 48 48 5 100 200 1000 3
 Pistol 20 20 25 2000 30 20
 Shotgun 10 10 25 250 1000 15 8

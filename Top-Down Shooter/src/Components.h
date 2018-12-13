@@ -166,8 +166,8 @@ class CInventory : public Component
 public:
 	bool hasHPot;
 	bool hasSPot;
-	int hPotCount;
-	int sPotCount;
+	int hPotCount = 0;
+	int sPotCount = 0;
 	CInventory() {}
 };
 
