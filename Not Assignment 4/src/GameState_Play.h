@@ -25,6 +25,7 @@ protected:
 
     EntityManager           m_entityManager;
     std::shared_ptr<Entity> m_player;
+	std::shared_ptr<Entity> player_aura;
     std::string             m_levelPath;
     PlayerConfig            m_playerConfig;
 	WeaponConfig			m_pistolConfig;

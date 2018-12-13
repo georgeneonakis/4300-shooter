@@ -38,12 +38,36 @@ Texture	  TexGB		images/ours/green_bullet.png
 Texture	  TexBB		images/ours/blue_bullet.png
 Texture	  TexFR		images/ours/frag.png
 Texture   TexSB		images/ours/allsidespikes.png
+Texture   TexHP		images/ours/redpotion.png
+Texture	  TexSP		images/ours/bluepotion.png
+Texture   TexPlayerM	images/ours/player-move.png
+Texture   TexPlayerA	images/ours/player-cast.png
+Texture   TexPlayerSt	images/ours/player-stand.png
+Texture   TexDrag	images/ours/dragon.png
+Texture   TexDino	images/ours/dinosaur.png
+Texture   TexGanon	images/ours/ganon.png
+Texture   TexRedAura	images/ours/red-aura.png
+Texture   TexGreenAura	images/ours/green-aura.png
+Texture   TexBlueAura	images/ours/blue-aura.png
+Texture   TexNoAura     images/ours/no-aura.png
+Animation NoAura	TexNoAura	1    0
+Animation RedAura	TexRedAura	1    0
+Animation GreenAura	TexGreenAura	1    0
+Animation BlueAura	TexBlueAura	1    0
+Animation Dragon        TexDrag		4    15
+Animation Dinosaur	TexDino		3    15
+Animation Ganon	        TexGanon	5    15
 Animation Frag		TexFR		3    12
 Animation SpikeBlock    TexSB		1    0
 Animation P_bullet      TexWB           1    0
 Animation S_bullet      TexRB           1    0
 Animation R_bullet      TexGB           1    0
 Animation L_bullet      TexBB           1    0
+Animation HPot		TexHP		1    0
+Animation SPot		TexSP		1    0
+Animation PlayerM	TexPlayerM      8    15
+Animation PlayerA	TexPlayerA	8    15
+Animation PlayerSt	TexPlayerSt	1    0
 Animation Bush          TexBush         1    0
 Animation Bush          TexBush         1    0
 Animation Bush          TexBush         1    0

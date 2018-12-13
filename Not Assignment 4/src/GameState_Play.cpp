@@ -48,6 +48,8 @@ void GameState_Play::loadLevel(const std::string & filename)
 			float rx, ry, tx, ty, bm, bv, speed, damage;
 			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed >> damage;
 
+			std::cout << name << "   " << rx << "   " << ry << "   " << tx << "   " << ty << "   " << bm << "   " << bv << "   " << "     We in here\n";
+
 			block->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
@@ -68,6 +70,35 @@ void GameState_Play::loadLevel(const std::string & filename)
 
 		}
 
+		else if (start == "HPot")
+		{
+			auto block = m_entityManager.addEntity("HealthPot");
+			std::string name;
+			float rx, ry, tx, ty, bm, bv;
+			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv;
+
+			std::cout << name << "   " << rx << "   " << ry << "   " << tx << "   " << ty << "   " << bm << "   " << bv << "   " << "     We in Here\n";
+
+			block->addComponent<CAnimation>(m_game.getAssets().getAnimation("HPot"), true);
+			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+
+		}
+
+
+		else if (start == "SPot")
+		{
+			auto pot = m_entityManager.addEntity("ShieldPot");
+			std::string name;
+			int x, y, bm, bv;
+
+			fin >> name >> x >> y >> bm >> bv;
+
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			pot->addComponent<CTransform>(Vec2(x, y));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+		}
+
 		else if (start == "NPC")
 		{
 			auto npc = m_entityManager.addEntity("NPC");
@@ -75,6 +106,8 @@ void GameState_Play::loadLevel(const std::string & filename)
 			float rx, ry, tx, ty, bm, bv, speed, damage;
 			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed >> damage;
 
+
+			bm = 1;
 			npc->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			npc->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
 			npc->addComponent<CBoundingBox>(npc->getComponent<CAnimation>()->animation.getSize(), bm, bv);
@@ -124,32 +157,7 @@ void GameState_Play::loadLevel(const std::string & filename)
 			fin >> m_fragConfig.CX >> m_fragConfig.CY >> m_fragConfig.SPEED >> m_fragConfig.LIFESPAN >> m_fragConfig.FIRERATE >> m_fragConfig.DAMAGE;
 		}
 
-		else if (start == "HPot")
-		{
-			auto pot = m_entityManager.addEntity("HealthPot");
-			std::string name;
-			int x, y, bm, bv;
 
-			fin >> name >> x >> y >> bm >> bv;
-
-			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
-			pot->addComponent<CTransform>(Vec2(x, y));
-			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), bm, bv);
-		}
-
-
-		else if (start == "SPot")
-		{
-			auto pot = m_entityManager.addEntity("ShieldPot");
-			std::string name;
-			int x, y, bm, bv;
-
-			fin >> name >> x >> y >> bm >> bv;
-
-			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
-			pot->addComponent<CTransform>(Vec2(x, y));
-			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), bm, bv);
-		}
 		getline(fin, empty, '\n');
 	}
     spawnPlayer();
@@ -158,17 +166,25 @@ void GameState_Play::loadLevel(const std::string & filename)
 // Spawn the player
 void GameState_Play::spawnPlayer()
 {
+
     m_player = m_entityManager.addEntity("player");
     m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
-    m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandDown"), true);
+    m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
 	m_player->addComponent<CWeapons>(true, true, true);
 	m_player->addComponent<CHealth>(100);
 	m_player->addComponent<CShield>(0);
+	m_player->addComponent<CAura>(0);
 	m_player->addComponent<CInventory>();
 	m_player->addComponent<CDash>(m_playerConfig.DTIME, m_playerConfig.DCOOLDOWN, m_playerConfig.DSPEED);
 	startreload();
+
+	player_aura = m_entityManager.addEntity("Tile");
+	player_aura->addComponent<CTransform>(Vec2(m_player->getComponent<CTransform>()->pos));
+	player_aura->addComponent<CAnimation>(m_game.getAssets().getAnimation("NoAura"), true);
+	player_aura->addComponent<CBoundingBox>(Vec2(2, 2), false, false);
+
 }
 
 // Fire the current weapon at the cursor
@@ -179,8 +195,11 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 	Vec2 difference = target - entity->getComponent<CTransform>()->pos;
 	float distance = target.dist(entity->getComponent<CTransform>()->pos);
 	Vec2 normal = difference / distance;
-
-	std::cout << m_player->getComponent<CWeapons>()->pistol_ammo << " " << m_player->getComponent<CWeapons>()->shotgun_ammo << " " << m_player->getComponent<CWeapons>()->rifle_ammo << " " << m_player->getComponent<CWeapons>()->launcher_ammo << " \n";
+	if (weapon->canShoot)
+	{
+		m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerA"), true);
+	}
+	//std::cout << m_player->getComponent<CWeapons>()->pistol_ammo << " " << m_player->getComponent<CWeapons>()->shotgun_ammo << " " << m_player->getComponent<CWeapons>()->rifle_ammo << " " << m_player->getComponent<CWeapons>()->launcher_ammo << " \n";
 	if (weapon->current == 1 && weapon->canShoot && m_player->getComponent<CWeapons>()->startreload == false)
 	{
 		if(m_player->getComponent<CWeapons>()->pistol_ammo > 0)
@@ -352,6 +371,18 @@ void GameState_Play::sMovement()
 		{
 			pDash->canDash = true;
 		}
+
+		if ((pTransform->speed.x != 0 || pTransform->speed.y != 0) && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerM" && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerA")
+		{
+			std::cout << m_player->getComponent<CAnimation>()->animation.getName() << "     Trying\n";
+			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
+		}
+		else if (pTransform->speed.x == 0 && pTransform->speed.y ==0 && m_player->getComponent<CAnimation>()->animation.getName()!= "PlayerA")
+		{
+			std::cout << m_player->getComponent<CAnimation>()->animation.getName() << "     Not Trying\n";
+			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerSt"), true);
+
+		}
 		pTransform->speed = Vec2(0, 0);
 		// Determine player's speed based on input
 		if (pInput->up)
@@ -382,13 +413,17 @@ void GameState_Play::sMovement()
 	Vec2 relativePosition = mousePosition + Vec2(m_player->getComponent<CTransform>()->pos);
 	Vec2 difference = m_player->getComponent<CTransform>()->pos - relativePosition;
 	m_player->getComponent<CTransform>()->angle = -atan2(difference.x, difference.y) * 180 / 3.14159;
-	
+
 	// Move all entities
 	for (auto e : m_entityManager.getEntities())
 	{
 		e->getComponent<CTransform>()->prevPos = Vec2(e->getComponent<CTransform>()->pos);
 		e->getComponent<CTransform>()->pos += e->getComponent<CTransform>()->speed;
 	}
+
+	player_aura->getComponent<CTransform>()->pos = Vec2(m_player->getComponent<CTransform>()->pos);
+	player_aura->getComponent<CTransform>()->angle = float(m_player->getComponent<CTransform>()->angle);
+	player_aura->getComponent<CTransform>()->scale = Vec2(m_player->getComponent<CTransform>()->scale);
 }
 
 
@@ -708,8 +743,9 @@ void GameState_Play::sCollision()
 		{
 			m_player->getComponent<CInventory>()->hasHPot = true;
 			m_player->getComponent<CInventory>()->hPotCount++;
+			e->destroy();
 		}
-		e->destroy();
+
 	}
 
 	for (auto e : m_entityManager.getEntities("ShieldPot"))
@@ -719,8 +755,9 @@ void GameState_Play::sCollision()
 		{
 			m_player->getComponent<CInventory>()->hasSPot = true;
 			m_player->getComponent<CInventory>()->sPotCount++;
+			e->destroy();
 		}
-		e->destroy();
+
 	}
 
 
@@ -855,11 +892,43 @@ void GameState_Play::sCollision()
 	// Check for collisions with NPCs
 	for (auto e : m_entityManager.getEntities("NPC"))
 	{
+
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
 			inflictDamage(e, m_player);
+			Vec2 prevOverlap = Physics::GetPreviousOverlap(e, m_player);
+			// Player colliding from the side
+			if (prevOverlap.x <= 0 && prevOverlap.y > 0)
+			{
+				// Colliding from the left
+				if (m_player->getComponent<CTransform>()->pos.x < e->getComponent<CTransform>()->pos.x)
+				{
+					m_player->getComponent<CTransform>()->pos.x -= playerOverlap.x+50;
+				}
+				// Colliding from the right
+				else
+				{
+					m_player->getComponent<CTransform>()->pos.x += playerOverlap.x+50;
+				}
+			}
+			// Player colliding from the top or bottom
+			else
+			{
+				// Colliding from the top
+				if (m_player->getComponent<CTransform>()->pos.y < e->getComponent<CTransform>()->pos.y)
+				{
+					m_player->getComponent<CTransform>()->pos.y -= playerOverlap.y+50;
+				}
+				// Colliding from the bottom
+				else
+				{
+					m_player->getComponent<CTransform>()->pos.y += playerOverlap.y+50;
+				}
+			}
 		}
+
+
 		for (auto bullet : m_entityManager.getEntities("Bullet"))
 		{
 			Vec2 bulletOverlap = Physics::GetOverlap(e, bullet);
@@ -892,8 +961,24 @@ void GameState_Play::sAnimation()
 		{
 			e->destroy();
 		}
+		else if (e->getComponent<CAnimation>()->animation.getName() == "PlayerA" && e->getComponent<CAnimation>()->animation.hasEnded())
+		{
+			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
+		}
+	}
+
+	auto color = m_player->getComponent<CAura>()->color;
+
+	switch (color)
+	{
+	case 1: {player_aura->addComponent<CAnimation>(m_game.getAssets().getAnimation("NoAura"), true); break; }
+	case 2: {player_aura->addComponent<CAnimation>(m_game.getAssets().getAnimation("RedAura"), true); break; }
+	case 3: {player_aura->addComponent<CAnimation>(m_game.getAssets().getAnimation("GreenAura"), true); break; }
+	case 4: {player_aura->addComponent<CAnimation>(m_game.getAssets().getAnimation("BlueAura"), true); break; }
 	}
 }
+
+
 
 void GameState_Play::sInventory()
 {
@@ -977,19 +1062,28 @@ void GameState_Play::sUserInput()
 						sPot = true;
 					}
 				}
-				case sf::Keyboard::Num1:	{ m_player->getComponent<CWeapons>()->current = 1; break;}
+				case sf::Keyboard::Num1:	
+				{
+					m_player->getComponent<CAura>()->color = 1;
+					m_player->getComponent<CWeapons>()->current = 1; 
+					break;
+				}
 				case sf::Keyboard::Num2: 
 				{
+
 					if (m_player->getComponent<CWeapons>()->hasTwo)
 					{
+						m_player->getComponent<CAura>()->color = 2;
 						m_player->getComponent<CWeapons>()->current = 2;
 					}
 					break;
 				}
 				case sf::Keyboard::Num3:
 				{
+
 					if (m_player->getComponent<CWeapons>()->hasThree)
 					{
+						m_player->getComponent<CAura>()->color = 3;
 						m_player->getComponent<CWeapons>()->current = 3;
 					}
 					break;
@@ -998,6 +1092,7 @@ void GameState_Play::sUserInput()
 				{
 					if (m_player->getComponent<CWeapons>()->hasFour)
 					{
+						m_player->getComponent<CAura>()->color = 4;
 						m_player->getComponent<CWeapons>()->current = 4;
 					}
 					break;

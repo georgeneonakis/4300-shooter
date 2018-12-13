@@ -74,6 +74,14 @@ public:
         : animation(animation), repeat(r) {}
 };
 
+class CAura : public Component
+{
+public:
+	int color = 1;
+
+	CAura(int c) : color(c) {}
+};
+
 class CGravity : public Component
 {
 public:
