@@ -19,6 +19,7 @@
     <ClCompile Include="..\src\GameState.cpp" />
     <ClCompile Include="..\src\GameState_Menu.cpp" />
     <ClCompile Include="..\src\GameState_Play.cpp" />
+    <ClCompile Include="..\src\Inventory.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Physics.cpp" />
     <ClCompile Include="..\src\Vec2.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="..\src\GameState.h" />
     <ClInclude Include="..\src\GameState_Menu.h" />
     <ClInclude Include="..\src\GameState_Play.h" />
+    <ClInclude Include="..\src\Inventory.h" />
     <ClInclude Include="..\src\Physics.h" />
     <ClInclude Include="..\src\Vec2.h" />
   </ItemGroup>

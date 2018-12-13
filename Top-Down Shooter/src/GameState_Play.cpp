@@ -4,6 +4,7 @@
 #include "Assets.h"
 #include "GameEngine.h"
 #include "Components.h"
+#include "Inventory.h"
 #include <iostream>
 
 
@@ -370,18 +371,21 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 		damage->nextFire = damage->clock.getElapsedTime().asMilliseconds() + damage->fireRate;
 		if (health->currentShield > 0)
 		{
-			if (health->currentShield > damage->damage)
+			if (health->currentShield >= damage->damage)
 			{
 				health->currentShield -= damage->damage;
 				return;
 			}
 			else
 			{
-				damage->damage -= health->currentShield;
+				health->currentHP -= damage->damage - health->currentShield;
 				health->currentShield = 0;
 			}
 		}
-		health->currentHP -= damage->damage;
+		else
+		{
+			health->currentHP -= damage->damage;
+		}
 		if (health->currentHP <= 0)
 		{
 			if (target->tag() == "player")
@@ -802,7 +806,6 @@ void GameState_Play::sCollision()
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
-			m_player->getComponent<CInventory>()->hasHPot = true;
 			m_player->getComponent<CInventory>()->hPotCount++;
 			e->destroy();
 		}
@@ -814,7 +817,6 @@ void GameState_Play::sCollision()
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
-			m_player->getComponent<CInventory>()->hasSPot = true;
 			m_player->getComponent<CInventory>()->sPotCount++;
 			e->destroy();
 		}
@@ -1071,33 +1073,6 @@ void GameState_Play::sAnimation()
 	}
 }
 
-
-
-void GameState_Play::sInventory()
-{
-	if (hPot && m_player->getComponent<CInventory>()->hPotCount >= 1)
-	{
-		m_player->getComponent<CHealth>()->currentHP += 25;
-		if (m_player->getComponent<CHealth>()->currentHP > m_player->getComponent<CHealth>()->maxHP)
-		{
-			m_player->getComponent<CHealth>()->currentHP = m_player->getComponent<CHealth>()->maxHP;
-		}
-		m_player->getComponent<CInventory>()->hPotCount--;
-		hPot = false;
-	}
-
-	if (sPot && m_player->getComponent<CInventory>()->sPotCount >= 1)
-	{
-		m_player->getComponent<CHealth>()->currentShield += 25;
-		if (m_player->getComponent<CHealth>()->currentShield > m_player->getComponent<CHealth>()->maxShield)
-		{
-			m_player->getComponent<CHealth>()->currentShield = m_player->getComponent<CHealth>()->maxShield;
-		}
-		m_player->getComponent<CInventory>()->sPotCount--;
-		sPot = false;
-	}
-}
-
 // Receive user input
 void GameState_Play::sUserInput()
 {
@@ -1147,19 +1122,13 @@ void GameState_Play::sUserInput()
 				case sf::Keyboard::Tab: { m_showInventory = !m_showInventory; setPaused(!m_paused); break; }
 				case sf::Keyboard::J:
 				{
-					if (m_player->getComponent<CInventory>()->hasHPot)
-					{
-						hPot = true;
-						break;
-					}
+					Inventory::UseHealthPotion(m_player);
+					break;
 				}
 				case sf::Keyboard::K:
 				{
-					if (m_player->getComponent<CInventory>()->hasSPot)
-					{
-						sPot = true;
-						break;
-					}
+					Inventory::UseShieldPotion(m_player);
+					break;
 				}
 				case sf::Keyboard::Num1:	
 				{

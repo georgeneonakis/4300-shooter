@@ -40,8 +40,6 @@ protected:
     bool                    m_drawCollision = false;
     bool                    m_follow = false;
 	bool					m_showInventory = false;
-	bool					hPot = false;
-	bool					sPot = false;
 	int						m_windowX = 1280;
 	int						m_windowY = 768;
     
@@ -58,8 +56,6 @@ protected:
 	void inflictDamage(std::shared_ptr<Entity> source, std::shared_ptr<Entity> target);
 
 	void sSteer();
-	void sInventory();
-
     void sMovement();
     void sAI();
     void sLifespan();
