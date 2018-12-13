@@ -13,7 +13,7 @@ x. Implement multiple weapons
 
 x. Implement HP system
  x Make an HP component
- - Represent HP on HUD
+ x Represent HP on HUD
  x Make a damage component
 
 5. Items, inventory, inventory menu
@@ -32,22 +32,22 @@ x. Implement HP system
 Extras
 
 8. Reloading
- - Add ammo to weapon component
+ x Add ammo to weapon component
  - Display current ammo somehow
  - Have a reload button
 
-9. Ricochet
- - Make some bouncing bullets
+x. Ricochet
+ x Make some bouncing bullets
 
 10. Dashing / Teleportation
- - Make some kind of short-range dash
+ x Make some kind of short-range dash
  - Make doors that can teleport to other areas
 
 11. Stealth
  - Make something that blocks vision but not movement
 
-12. Explosions
- - Decide whether to do frag or actual radius explosion
+x. Explosions
+ x Decide whether to do frag or actual radius explosion
 
 13. Maybe slow motion
 

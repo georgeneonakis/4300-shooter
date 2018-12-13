@@ -1,8 +1,0 @@
-﻿  GameState_Play.cpp
-c:\users\kishoto\documents\github\4300-shooter\not assignment 4\src\gamestate_play.cpp(421): warning C4305: 'initializing': truncation from 'double' to 'float'
-  Generating code
-  7 of 1642 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  SFMLGame.vcxproj -> C:\Users\Kishoto\Documents\GitHub\4300-shooter\Not Assignment 4\visualstudio\../bin/SFMLGame.exe
