@@ -1,25 +1,26 @@
 Core shit
 
-1. Set up base project on github
+x. Set up base project on github
 
-2. Implement directional shooting
- - Rotate player to always face cursor
+x. Implement directional shooting
+ x Rotate player to always face cursor
 
-3. Implement multiple weapons
- - Come up with the weapons
- - Weapon component
- - Switch between weapons with 1,2,3,4
- - Only switch to weapons that you have already picked up
+x. Implement multiple weapons
+ x Come up with the weapons
+ x Weapon component
+ x Switch between weapons with 1,2,3,4
+ x Only switch to weapons that you have already picked up
 
-4. Implement HP system
- - Make an HP component
- - Make a damage component
+x. Implement HP system
+ x Make an HP component
+ - Represent HP on HUD
+ x Make a damage component
 
 5. Items, inventory, inventory menu
  - Come up with the items
- - Inventory component
- - Represent items in the world / pick them up
- - Use items
+ x Inventory component
+ x Represent items in the world / pick them up
+ x Use items
  - Display inventory menu
 
 6. Add gravity component
@@ -59,6 +60,7 @@ Finishing Touches
 
 15. Menu with level select / final boss
  - Make the menu
+ - Make weapon unlocks persist across levels
  - Make it possible for the menu to recognize which levels you have beaten
 
 16. Art and sound assets

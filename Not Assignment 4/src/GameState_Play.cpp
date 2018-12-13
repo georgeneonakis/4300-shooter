@@ -99,6 +99,45 @@ void GameState_Play::loadLevel(const std::string & filename)
 			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), bm, bv);
 		}
 
+		else if (start == "ShotgunPickup")
+		{
+			auto shotgun = m_entityManager.addEntity("Shotgun");
+			std::string name;
+			int rx, ry, tx, ty;
+
+			fin >> name >> rx >> ry >> tx >> ty;
+
+			shotgun->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			shotgun->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			shotgun->addComponent<CBoundingBox>(shotgun->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+
+		else if (start == "RiflePickup")
+		{
+			auto rifle = m_entityManager.addEntity("Rifle");
+			std::string name;
+			int rx, ry, tx, ty;
+
+			fin >> name >> rx >> ry >> tx >> ty;
+
+			rifle->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			rifle->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			rifle->addComponent<CBoundingBox>(rifle->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+
+		else if (start == "LauncherPickup")
+		{
+			auto launcher = m_entityManager.addEntity("Launcher");
+			std::string name;
+			int rx, ry, tx, ty;
+
+			fin >> name >> rx >> ry >> tx >> ty;
+
+			launcher->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			launcher->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			launcher->addComponent<CBoundingBox>(launcher->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+
 		else if (start == "NPC")
 		{
 			auto npc = m_entityManager.addEntity("NPC");
@@ -172,7 +211,7 @@ void GameState_Play::spawnPlayer()
     m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
-	m_player->addComponent<CWeapons>(true, true, true);
+	m_player->addComponent<CWeapons>(false, false, false);
 	m_player->addComponent<CHealth>(100);
 	m_player->addComponent<CShield>(0);
 	m_player->addComponent<CAura>(0);
@@ -760,6 +799,38 @@ void GameState_Play::sCollision()
 
 	}
 
+	for (auto e : m_entityManager.getEntities("Shotgun"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			m_player->getComponent<CWeapons>()->hasTwo = true;
+			e->destroy();
+		}
+
+	}
+
+	for (auto e : m_entityManager.getEntities("Rifle"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			m_player->getComponent<CWeapons>()->hasThree = true;
+			e->destroy();
+		}
+
+	}
+
+	for (auto e : m_entityManager.getEntities("Launcher"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			m_player->getComponent<CWeapons>()->hasFour = true;
+			e->destroy();
+		}
+
+	}
 
 	for (auto e : m_entityManager.getEntities("Spike"))
 	{
