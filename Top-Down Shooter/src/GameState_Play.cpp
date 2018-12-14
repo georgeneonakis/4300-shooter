@@ -1058,6 +1058,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CWeapons>()->hasTwo = true;
 			m_game.getShotgun();
 			e->destroy();
+			m_game.popState();
 		}
 	}
 	for (auto e : m_entityManager.getEntities("Rifle"))
@@ -1068,6 +1069,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CWeapons>()->hasThree = true;
 			m_game.getRifle();
 			e->destroy();
+			m_game.popState();
 		}
 	}
 	for (auto e : m_entityManager.getEntities("Launcher"))
@@ -1078,6 +1080,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CWeapons>()->hasFour = true;
 			m_game.getLauncher();
 			e->destroy();
+			m_game.popState();
 		}
 	}
 
@@ -1328,9 +1331,6 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::A:       { pInput->left = true; break; }
                 case sf::Keyboard::S:       { pInput->down = true; break; }
                 case sf::Keyboard::D:       { pInput->right = true; break; }
-                case sf::Keyboard::Z:       { init(m_levelPath); break; }
-                case sf::Keyboard::T:       { m_drawTextures = !m_drawTextures; break; }
-                case sf::Keyboard::F:       { m_drawCollision = !m_drawCollision; break; }
                 case sf::Keyboard::P:       { setPaused(!m_paused); break; }
 				case sf::Keyboard::R:		{startreload(); break; }
 				case sf::Keyboard::LShift:
@@ -1346,22 +1346,22 @@ void GameState_Play::sUserInput()
 					break;
 				}
 				case sf::Keyboard::Tab: { m_showInventory = !m_showInventory; setPaused(!m_paused); break; }
-				case sf::Keyboard::J:
+				case sf::Keyboard::Z:
 				{
 					Inventory::UseHealthPotion(m_player);
 					break;
 				}
-				case sf::Keyboard::K:
+				case sf::Keyboard::X:
 				{
 					Inventory::UseShieldPotion(m_player);
 					break;
 				}
-				case sf::Keyboard::U:
+				case sf::Keyboard::C:
 				{
 					Inventory::UseSpeedPotion(m_player);
 					break;
 				}
-				case sf::Keyboard::I:
+				case sf::Keyboard::V:
 				{
 					Inventory::UseStealthPotion(m_player);
 					break;
