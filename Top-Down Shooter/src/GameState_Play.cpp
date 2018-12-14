@@ -1307,7 +1307,7 @@ void GameState_Play::sUserInput()
             }
         }
 
-		if (event.type == sf::Event::MouseButtonReleased)
+		if (event.type == sf::Event::MouseButtonReleased && !m_paused)
 		{
 			m_player->getComponent<CWeapons>()->canShoot = true;
 		}
@@ -1317,96 +1317,173 @@ void GameState_Play::sUserInput()
 // Determine camera view and draw all entities to the screen
 void GameState_Play::sRender()
 {
-    m_game.window().clear(sf::Color(255, 192, 122));
+	m_game.window().clear(sf::Color(255, 192, 122));
 	sf::View view = m_game.window().getView();
 
 	// Center camera on the player
 	view.setCenter(sf::Vector2f(m_player->getComponent<CTransform>()->pos.x, m_player->getComponent<CTransform>()->pos.y));
 	m_game.window().setView(view);
 
-    // draw all Entity textures / animations
-    if (m_drawTextures)
-    {
-        for (auto e : m_entityManager.getEntities())
-        {
-            auto transform = e->getComponent<CTransform>();
+	// draw all Entity textures / animations
+	if (m_drawTextures)
+	{
+		for (auto e : m_entityManager.getEntities())
+		{
+			auto transform = e->getComponent<CTransform>();
 
-            if (e->hasComponent<CAnimation>())
-            {
-                auto animation = e->getComponent<CAnimation>()->animation;
-                animation.getSprite().setRotation(transform->angle);
-                animation.getSprite().setPosition(transform->pos.x, transform->pos.y);
-                animation.getSprite().setScale(transform->scale.x, transform->scale.y);
-                m_game.window().draw(animation.getSprite());
-            }
-        }
-    }
+			if (e->hasComponent<CAnimation>())
+			{
+				auto animation = e->getComponent<CAnimation>()->animation;
+				animation.getSprite().setRotation(transform->angle);
+				animation.getSprite().setPosition(transform->pos.x, transform->pos.y);
+				animation.getSprite().setScale(transform->scale.x, transform->scale.y);
+				m_game.window().draw(animation.getSprite());
+			}
+		}
+	}
 
-    // draw all Entity collision bounding boxes with a rectangleshape
-    if (m_drawCollision)
-    {
-        sf::CircleShape dot(4);
-        dot.setFillColor(sf::Color::Black);
-        for (auto e : m_entityManager.getEntities())
-        {
-            if (e->hasComponent<CBoundingBox>())
-            {
-                auto box = e->getComponent<CBoundingBox>();
-                auto transform = e->getComponent<CTransform>();
-                sf::RectangleShape rect;
-                rect.setSize(sf::Vector2f(box->size.x-1, box->size.y-1));
-                rect.setOrigin(sf::Vector2f(box->halfSize.x, box->halfSize.y));
-                rect.setPosition(transform->pos.x, transform->pos.y);
-                rect.setFillColor(sf::Color(0, 0, 0, 0));
+	// draw all Entity collision bounding boxes with a rectangleshape
+	if (m_drawCollision)
+	{
+		sf::CircleShape dot(4);
+		dot.setFillColor(sf::Color::Black);
+		for (auto e : m_entityManager.getEntities())
+		{
+			if (e->hasComponent<CBoundingBox>())
+			{
+				auto box = e->getComponent<CBoundingBox>();
+				auto transform = e->getComponent<CTransform>();
+				sf::RectangleShape rect;
+				rect.setSize(sf::Vector2f(box->size.x - 1, box->size.y - 1));
+				rect.setOrigin(sf::Vector2f(box->halfSize.x, box->halfSize.y));
+				rect.setPosition(transform->pos.x, transform->pos.y);
+				rect.setFillColor(sf::Color(0, 0, 0, 0));
 
-                if (box->blockMove && box->blockVision)  { rect.setOutlineColor(sf::Color::Black); }
-                if (box->blockMove && !box->blockVision) { rect.setOutlineColor(sf::Color::Blue); }
-                if (!box->blockMove && box->blockVision) { rect.setOutlineColor(sf::Color::Red); }
-                if (!box->blockMove && !box->blockVision) { rect.setOutlineColor(sf::Color::White); }
-                rect.setOutlineThickness(1);
-                m_game.window().draw(rect);
-            }
+				if (box->blockMove && box->blockVision) { rect.setOutlineColor(sf::Color::Black); }
+				if (box->blockMove && !box->blockVision) { rect.setOutlineColor(sf::Color::Blue); }
+				if (!box->blockMove && box->blockVision) { rect.setOutlineColor(sf::Color::Red); }
+				if (!box->blockMove && !box->blockVision) { rect.setOutlineColor(sf::Color::White); }
+				rect.setOutlineThickness(1);
+				m_game.window().draw(rect);
+			}
 
-            if (e->hasComponent<CPatrol>())
-            {
-                auto & patrol = e->getComponent<CPatrol>()->positions;
-                for (size_t p = 0; p < patrol.size(); p++)
-                {
-                    dot.setPosition(patrol[p].x, patrol[p].y);
-                    m_game.window().draw(dot);
-                }
-            }
+			if (e->hasComponent<CPatrol>())
+			{
+				auto & patrol = e->getComponent<CPatrol>()->positions;
+				for (size_t p = 0; p < patrol.size(); p++)
+				{
+					dot.setPosition(patrol[p].x, patrol[p].y);
+					m_game.window().draw(dot);
+				}
+			}
 
-            if (e->hasComponent<CFollowPlayer>())
-            {
-                sf::VertexArray lines(sf::LinesStrip, 2);
-                lines[0].position.x = e->getComponent<CTransform>()->pos.x;
-                lines[0].position.y = e->getComponent<CTransform>()->pos.y;
-                lines[0].color = sf::Color::Black;
-                lines[1].position.x = m_player->getComponent<CTransform>()->pos.x;
-                lines[1].position.y = m_player->getComponent<CTransform>()->pos.y;
-                lines[1].color = sf::Color::Black;
-                m_game.window().draw(lines);
-                dot.setPosition(e->getComponent<CFollowPlayer>()->home.x, e->getComponent<CFollowPlayer>()->home.y);
-                m_game.window().draw(dot);
-            }
-        }
-    }
+			if (e->hasComponent<CFollowPlayer>())
+			{
+				sf::VertexArray lines(sf::LinesStrip, 2);
+				lines[0].position.x = e->getComponent<CTransform>()->pos.x;
+				lines[0].position.y = e->getComponent<CTransform>()->pos.y;
+				lines[0].color = sf::Color::Black;
+				lines[1].position.x = m_player->getComponent<CTransform>()->pos.x;
+				lines[1].position.y = m_player->getComponent<CTransform>()->pos.y;
+				lines[1].color = sf::Color::Black;
+				m_game.window().draw(lines);
+				dot.setPosition(e->getComponent<CFollowPlayer>()->home.x, e->getComponent<CFollowPlayer>()->home.y);
+				m_game.window().draw(dot);
+			}
+		}
+	}
 
 	if (m_showInventory)
 	{
-		int items = 4;
 		auto window = m_game.window().getSize();
-		int invX = window.x * 0.7;
+		auto pPos = m_player->getComponent<CTransform>();
+		auto health = m_entityManager.getEntities("HealthPot");
+
+		m_itemLabel.setPosition(pPos->pos.x + 270, pPos->pos.y - 350);
+		m_itemLabel.setString("ITEMS");
+		m_itemLabel.setCharacterSize(48);
+
+		m_weaponLabel.setPosition(pPos->pos.x + 270, pPos->pos.y - 51);
+		m_weaponLabel.setString("WEAPONS");
+		m_weaponLabel.setCharacterSize(48);
 
 		sf::RectangleShape rect;
-		rect.setSize(sf::Vector2f(window.x * 0.3 - 5, window.y));
-		rect.setPosition(window.x * 0.7, -20);
+		rect.setSize(sf::Vector2f(window.x * 0.3 - 5, window.y - 65));
+		rect.setPosition(pPos->pos.x + 255, pPos->pos.y - 380);
 		rect.setFillColor(sf::Color::Black);
 		rect.setOutlineThickness(5);
 
-		sf::RectangleShape slots;
+		sf::RectangleShape healthRect;
+		healthRect.setSize(sf::Vector2f(64, 64));
+		//healthRect.setTexture(m_game.getAssets().getAnimation("HPot").getSprite());
+		//healthRect.setTexture((sf::Texture)health->getComponent<CAnimation>()->animation.getName());
+		healthRect.setPosition(pPos->pos.x + 320, pPos->pos.y - 270);
+
+		sf::RectangleShape shieldRect;
+		shieldRect.setSize(sf::Vector2f(64, 64));
+		//shieldRect.setTexture();
+		shieldRect.setPosition(pPos->pos.x + 484, pPos->pos.y - 270);
+
+		sf::RectangleShape speedRect;
+		speedRect.setSize(sf::Vector2f(64, 64));
+		speedRect.setPosition(pPos->pos.x + 320, pPos->pos.y - 156);
+
+		sf::RectangleShape stealthRect;
+		stealthRect.setSize(sf::Vector2f(64, 64));
+		stealthRect.setPosition(pPos->pos.x + 484, pPos->pos.y - 156);
+
+		sf::RectangleShape w1Rect;
+		w1Rect.setSize(sf::Vector2f(64, 64));
+		//shieldRect.setTexture();
+		w1Rect.setPosition(pPos->pos.x + 320, pPos->pos.y + 60);
+
+		sf::RectangleShape w2Rect;
+		w2Rect.setSize(sf::Vector2f(64, 64));
+		//shieldRect.setTexture();
+		w2Rect.setPosition(pPos->pos.x + 484, pPos->pos.y + 60);
+
+		sf::RectangleShape w3Rect;
+		w3Rect.setSize(sf::Vector2f(64, 64));
+		//shieldRect.setTexture();
+		w3Rect.setPosition(pPos->pos.x + 320, pPos->pos.y + 174);
+
+		sf::RectangleShape w4Rect;
+		w4Rect.setSize(sf::Vector2f(64, 64));
+		//shieldRect.setTexture();
+		w4Rect.setPosition(pPos->pos.x + 484, pPos->pos.y + 174);
+
+		m_healthCount.setPosition(pPos->pos.x + 384, pPos->pos.y - 206);
+		m_healthCount.setCharacterSize(12);
+		m_healthCount.setString("x" + std::to_string(m_player->getComponent<CInventory>()->hPotCount));
+
+		m_shieldCount.setPosition(pPos->pos.x + 548, pPos->pos.y - 206);
+		m_shieldCount.setCharacterSize(12);
+		m_shieldCount.setString("x" + std::to_string(m_player->getComponent<CInventory>()->sPotCount));
+
+		m_speedCount.setPosition(pPos->pos.x + 384, pPos->pos.y - 92);
+		m_speedCount.setCharacterSize(12);
+		m_speedCount.setString("x" + std::to_string(m_player->getComponent<CInventory>()->speedCount));
+
+
+		m_stealthCount.setPosition(pPos->pos.x + 548, pPos->pos.y - 92);
+		m_stealthCount.setCharacterSize(12);
+		m_stealthCount.setString("x" + std::to_string(m_player->getComponent<CInventory>()->stealthCount));
+
 		m_game.window().draw(rect);
+		m_game.window().draw(healthRect);
+		m_game.window().draw(shieldRect);
+		m_game.window().draw(speedRect);
+		m_game.window().draw(stealthRect);
+		m_game.window().draw(w1Rect);
+		m_game.window().draw(w2Rect);
+		m_game.window().draw(w3Rect);
+		m_game.window().draw(w4Rect);
+		m_game.window().draw(m_itemLabel);
+		m_game.window().draw(m_weaponLabel);
+		m_game.window().draw(m_healthCount);
+		m_game.window().draw(m_shieldCount);
+		m_game.window().draw(m_speedCount);
+		m_game.window().draw(m_stealthCount);
 	}
 
 	m_playerHealth.setPosition(m_player->getComponent<CTransform>()->pos.x - 600, m_player->getComponent<CTransform>()->pos.y + 250);
@@ -1420,29 +1497,29 @@ void GameState_Play::sRender()
 	m_playerAmmo.setPosition(m_player->getComponent<CTransform>()->pos.x - 400, m_player->getComponent<CTransform>()->pos.y + 250);
 	switch (m_player->getComponent<CWeapons>()->current)
 	{
-		case 1:
-		{
-			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->pistol_ammo));
-			break;
-		}
-		case 2:
-		{
-			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->shotgun_ammo));
-			break;
-		}
-		case 3:
-		{
-			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->rifle_ammo));
-			break;
-		}
-		case 4:
-		{
-			m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->launcher_ammo));
-			break;
-		}
+	case 1:
+	{
+		m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->pistol_ammo));
+		break;
+	}
+	case 2:
+	{
+		m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->shotgun_ammo));
+		break;
+	}
+	case 3:
+	{
+		m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->rifle_ammo));
+		break;
+	}
+	case 4:
+	{
+		m_playerAmmo.setString(std::to_string(m_player->getComponent<CWeapons>()->launcher_ammo));
+		break;
+	}
 	}
 	m_game.window().draw(m_playerAmmo);
 
-    m_game.window().display();
+	m_game.window().display();
 }
 

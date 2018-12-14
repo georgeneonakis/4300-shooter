@@ -30,6 +30,12 @@ protected:
 	sf::Text				m_playerHealth;
 	sf::Text				m_playerShields;
 	sf::Text				m_playerAmmo;
+	sf::Text				m_itemLabel;
+	sf::Text				m_weaponLabel;
+	sf::Text				m_healthCount;
+	sf::Text				m_shieldCount;
+	sf::Text				m_speedCount;
+	sf::Text				m_stealthCount;
     PlayerConfig            m_playerConfig;
 	WeaponConfig			m_pistolConfig;
 	WeaponConfig			m_shotgunConfig;
