@@ -469,6 +469,10 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 			}
 			else
 			{
+				if (target->tag() == "NPC")
+				{
+					dropItem(target);
+				}
 				target->destroy();
 			}
 		}
@@ -508,6 +512,42 @@ void GameState_Play::spawnMissile(std::shared_ptr<Entity> shooter, std::shared_p
 	missile->addComponent<CAnimation>(m_game.getAssets().getAnimation("Arrow"), true);
 	missile->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
 	missile->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
+}
+
+void GameState_Play::dropItem(std::shared_ptr<Entity> source)
+{
+	int drop = rand() % 100;
+	if (drop >= 60)
+	{
+		if (drop < 70)
+		{
+			auto pot = m_entityManager.addEntity("HealthPot");
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation("HPot"), true);
+			pot->addComponent<CTransform>(Vec2(source->getComponent<CTransform>()->pos));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+		else if (drop < 80)
+		{
+			auto pot = m_entityManager.addEntity("ShieldPot");
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation("SPot"), true);
+			pot->addComponent<CTransform>(Vec2(source->getComponent<CTransform>()->pos));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+		else if (drop < 90)
+		{
+			auto pot = m_entityManager.addEntity("SpeedPot");
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation("Speed"), true);
+			pot->addComponent<CTransform>(Vec2(source->getComponent<CTransform>()->pos));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+		else
+		{
+			auto pot = m_entityManager.addEntity("StealthPot");
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation("Stealth"), true);
+			pot->addComponent<CTransform>(Vec2(source->getComponent<CTransform>()->pos));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+	}
 }
 
 // Game loop

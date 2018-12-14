@@ -40,6 +40,8 @@ Texture	  TexFR		images/ours/frag.png
 Texture   TexSB		images/ours/allsidespikes.png
 Texture   TexHP		images/ours/redpotion.png
 Texture	  TexSP		images/ours/bluepotion.png
+Texture   TexSpeed      images/ours/purplepotion.png
+Texture   TexStealth    images/ours/greypotion.png
 Texture   TexPlayerM	images/ours/player-move.png
 Texture   TexPlayerA	images/ours/player-cast.png
 Texture   TexPlayerSt	images/ours/player-stand.png
@@ -80,6 +82,8 @@ Animation R_bullet      TexGB           1    0
 Animation L_bullet      TexBB           1    0
 Animation HPot		TexHP		1    0
 Animation SPot		TexSP		1    0
+Animation Speed		TexSpeed	1    0
+Animation Stealth	TexStealth	1    0
 Animation PlayerM	TexPlayerM      8    15
 Animation PlayerA	TexPlayerA	8    15
 Animation PlayerSt	TexPlayerSt	1    0

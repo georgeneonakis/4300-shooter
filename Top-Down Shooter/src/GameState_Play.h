@@ -66,6 +66,7 @@ protected:
 	void endreload();
 	void inflictDamage(std::shared_ptr<Entity> source, std::shared_ptr<Entity> target);
 	void playerdeath();
+	void dropItem(std::shared_ptr<Entity> source);
 
 	void sGravity();
 	void sBuffs();
