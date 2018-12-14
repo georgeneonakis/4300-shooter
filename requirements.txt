@@ -26,8 +26,8 @@ x. Implement HP system
 x. Add gravity component
  x Make things move properly toward an attractor
 
-7. Steering
- - Rockets / possibly entity steering
+x. Steering
+ x Rockets / possibly entity steering
 
 Extras
 
@@ -39,9 +39,8 @@ x. Reloading
 x. Ricochet
  x Make some bouncing bullets
 
-10. Dashing / Teleportation
+x. Dashing
  x Make some kind of short-range dash
- - Make doors that can teleport to other areas
 
 x. Stealth
  x Make something that blocks vision but not movement

@@ -534,20 +534,21 @@ void GameState_Play::sMovement()
 }
 
 
-void GameState_Play::sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
+void GameState_Play::spawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
 {
 	float speed = 5.0;
-	float scale = 1.0;
 	auto missile = m_entityManager.addEntity("Missile");
-
-
+	Vec2 target = victim->getComponent<CTransform>()->pos;
+	Vec2 current = shooter->getComponent<CTransform>()->pos;
+	Vec2 difference = target - current;
+	float distance = target.dist(current);
+	Vec2 normal = difference / distance;
 	// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
-	missile->addComponent<CTransform>(Vec2(shooter->getComponent<CTransform>()->pos), Vec2(-speed, 0),
+	missile->addComponent<CTransform>(Vec2(shooter->getComponent<CTransform>()->pos), Vec2(normal.x * speed, normal.y * speed),
 		Vec2(1, 1), 0);
 	missile->addComponent<CAnimation>(m_game.getAssets().getAnimation("Arrow"), true);
 	missile->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
 	missile->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
-
 }
 
 void GameState_Play::sGravity()
@@ -598,27 +599,21 @@ void GameState_Play::sBuffs()
 
 void GameState_Play::sSteer()
 {
-	float speed = 2.0;
-	float scale = 0.05;
+	float scale = 0.1;
 
 	for (auto e : m_entityManager.getEntities("Missile"))
 	{
-		auto desired = (m_player->getComponent<CTransform>()->pos) - (e->getComponent<CTransform>()->pos);
-		desired = desired / desired.length();
-		desired = desired * e->getComponent<CTransform>()->speed.length();
-		auto steering = desired - e->getComponent<CTransform>()->speed;
+		auto target = m_player->getComponent<CTransform>();
+		auto current = e->getComponent<CTransform>();
+		Vec2 desired = target->pos - current->pos;
+		desired = desired / target->pos.dist(current->pos);
+		desired = desired * current->pos.dist(current->pos + current->speed);
+		Vec2 steering = desired - current->speed;
 		steering = steering * scale;
-		auto actual = e->getComponent<CTransform>()->speed + steering;
+		Vec2 actual = e->getComponent<CTransform>()->speed + steering;
 		e->getComponent<CTransform>()->speed = actual;
-
-		Vec2 playerposition = m_player->getComponent<CTransform>()->pos;
-		Vec2 relative = playerposition + Vec2(e->getComponent<CTransform>()->pos);
-		Vec2 difference = e->getComponent<CTransform>()->pos - relative;
-
-		e->getComponent<CTransform>()->angle = -atan2(difference.x, difference.y) * 180 / 3.14159;
+		e->getComponent<CTransform>()->angle = -atan2(current->speed.x, current->speed.y) * 180 / 3.14159;
 	}
-
-
 }
 
 sf::Clock clock2;
@@ -709,10 +704,10 @@ void GameState_Play::sAI()
 				e->getComponent<CTransform>()->speed = difference;
 			}
 			// If vision is not blocked, pursue player
-			/*int x = clock2.getElapsedTime().asMilliseconds();
+			int x = clock2.getElapsedTime().asMilliseconds();
 			if (x % 180 == 0) {
-				sSpawnMissile(e,m_player);
-			}*/
+				spawnMissile(e,m_player);
+			}
 		}
 	}
 }
@@ -720,6 +715,16 @@ void GameState_Play::sAI()
 // Track entity lifespans and destroy them if they expire
 void GameState_Play::sLifespan()
 {
+	for (auto e : m_entityManager.getEntities("Missile"))
+	{
+		int elap = e->getComponent<CLifeSpan>()->clock.getElapsedTime().asMilliseconds();
+		int life = e->getComponent<CLifeSpan>()->lifespan;
+
+		if (elap > life)
+		{
+			e->destroy();
+		}
+	}
 	for (auto e : m_entityManager.getEntities("Bullet"))
 	{
 		int elap = e->getComponent<CLifeSpan>()->clock.getElapsedTime().asMilliseconds();

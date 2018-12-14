@@ -82,13 +82,6 @@ public:
 	CAura(int c) : color(c) {}
 };
 
-class CState : public Component
-{
-public:
-    std::string state = "attack";
-    size_t frames = 0;
-    CState(const std::string & s) : state(s) {}
-};
 
 class CFollowPlayer : public Component
 {

@@ -50,7 +50,7 @@ protected:
     void update();
     void spawnPlayer();
     void fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & target);
-	void sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim);
+	void spawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim);
 	void startreload();
 	void endreload();
 	void inflictDamage(std::shared_ptr<Entity> source, std::shared_ptr<Entity> target);

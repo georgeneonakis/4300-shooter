@@ -83,8 +83,3 @@ Vec2 Vec2::abs() const
 {
     return Vec2(x < 0 ? -x : x, y < 0 ? -y : y);
 }
-
-float Vec2::length() const
-{
-	return sqrt(pow(x, 2) + pow(y, 2));
-}
