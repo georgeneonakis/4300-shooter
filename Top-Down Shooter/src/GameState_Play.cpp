@@ -273,7 +273,7 @@ void GameState_Play::spawnPlayer()
 	// Assign all components
     m_player = m_entityManager.addEntity("Player");
     m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
-    m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
+    m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerSt"), true);
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
 	m_player->addComponent<CWeapons>(false, false, false);
@@ -448,10 +448,14 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 		}
 		if (health->currentHP <= 0)
 		{
-			if (target->tag() == "Player")
+			if (target->tag() == "Player" && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerDeath")
 			{
-				m_game.popState();
-				return;
+				m_player->removeComponent<CAnimation>();
+				m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerDeath"), false);
+				m_player->addComponent<CBoundingBox>(Vec2(1, 1), true, false);
+			//std:: cout << m_player->getComponent<CAnimation>()->animation.getName();
+				//m_game.popState();
+				//return;
 			}
 			else
 			{
@@ -461,6 +465,25 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 	}
 }
 
+
+
+void GameState_Play::playerdeath()
+{
+	int test = 1;
+
+	for (auto e : m_entityManager.getEntities())
+	{
+		if (e->tag() == "Player")
+		{
+			test = 0;
+		}
+
+	}
+
+	if (test == 1) { m_game.popState(); return; }
+
+
+}
 // Spawn a homing missile
 void GameState_Play::spawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
 {
@@ -498,6 +521,7 @@ void GameState_Play::update()
 
     sUserInput();
     sRender();
+	playerdeath();
 }
 
 // Move entities each frame
@@ -513,32 +537,35 @@ void GameState_Play::sMovement()
 			pDash->canDash = true;
 		}
 
-		if ((pTransform->speed.x != 0 || pTransform->speed.y != 0) && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerM" && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerA")
+		if ((pTransform->speed.x != 0 || pTransform->speed.y != 0) && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerM" && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerA"&& m_player->getComponent<CAnimation>()->animation.getName() != "PlayerDeath")
 		{
 			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
 		}
-		else if (pTransform->speed.x == 0 && pTransform->speed.y ==0 && m_player->getComponent<CAnimation>()->animation.getName()!= "PlayerA")
+		else if (pTransform->speed.x == 0 && pTransform->speed.y ==0 && m_player->getComponent<CAnimation>()->animation.getName()!= "PlayerA" && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerDeath")
 		{
 			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerSt"), true);
 
 		}
 		pTransform->speed = Vec2(0, 0);
 		// Determine player's speed based on input
-		if (pInput->up)
+		if (m_player->getComponent<CAnimation>()->animation.getName() != "PlayerDeath")
 		{
-			pTransform->speed.y -= m_playerConfig.SPEED;
-		}
-		if (pInput->down)
-		{
-			pTransform->speed.y += m_playerConfig.SPEED;
-		}
-		if (pInput->left)
-		{
-			pTransform->speed.x -= m_playerConfig.SPEED;
-		}
-		if (pInput->right)
-		{
-			pTransform->speed.x += m_playerConfig.SPEED;
+			if (pInput->up)
+			{
+				pTransform->speed.y -= m_playerConfig.SPEED;
+			}
+			if (pInput->down)
+			{
+				pTransform->speed.y += m_playerConfig.SPEED;
+			}
+			if (pInput->left)
+			{
+				pTransform->speed.x -= m_playerConfig.SPEED;
+			}
+			if (pInput->right)
+			{
+				pTransform->speed.x += m_playerConfig.SPEED;
+			}
 		}
 	}
 	else if (pDash->clock.getElapsedTime().asMilliseconds() >= pDash->dashTimer)
@@ -1174,7 +1201,7 @@ void GameState_Play::sAnimation()
 		{
 			e->destroy();
 		}
-		else if (e->getComponent<CAnimation>()->animation.getName() == "PlayerA" && e->getComponent<CAnimation>()->animation.hasEnded())
+		else if (e->getComponent<CAnimation>()->animation.getName() == "PlayerA" && e->getComponent<CAnimation>()->animation.hasEnded() && m_player->getComponent<CAnimation>()->animation.getName() != "PlayerDeath")
 		{
 			m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
 		}

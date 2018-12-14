@@ -7,5 +7,5 @@ c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_pl
   c:\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
 c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bv': unreferenced local variable
 c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bm': unreferenced local variable
-c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(621): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(648): warning C4305: 'initializing': truncation from 'double' to 'float'
   SFMLGame.vcxproj -> C:\Users\Kishoto\Documents\GitHub\4300-shooter\Top-Down Shooter\visualstudio\../bin/SFMLGame_d.exe

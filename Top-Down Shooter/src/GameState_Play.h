@@ -60,6 +60,7 @@ protected:
 	void startreload();
 	void endreload();
 	void inflictDamage(std::shared_ptr<Entity> source, std::shared_ptr<Entity> target);
+	void playerdeath();
 
 	void sGravity();
 	void sBuffs();

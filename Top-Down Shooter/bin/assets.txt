@@ -55,6 +55,8 @@ Texture   TexSGW	images/ours/shotgun_weapon.png
 Texture   TexRFW	images/ours/rifle_weapon.png
 Texture   TexGFloor	images/ours/grey_floor.png
 Texture   TexWall	images/ours/grey_wall.png
+Texture   TexDeath	images/ours/player-die.png
+Animation PlayerDeath	TexDeath	8    15
 Animation GreyFloor	TexGFloor       1    0
 Animation GreyWall	TexWall		1    0
 Animation ShotgunItem	TexSGW		2    15
