@@ -270,7 +270,16 @@ void GameState_Play::loadLevel(const std::string & filename)
 	m_launcherSound.setBuffer(m_game.getAssets().getSound("Launcher"));
 	m_fragSound.setBuffer(m_game.getAssets().getSound("Frag"));
 
-    spawnPlayer();
+
+
+	m_itemLabel.setFont(m_game.getAssets().getFont("Megaman"));
+	m_weaponLabel.setFont(m_game.getAssets().getFont("Megaman"));
+	m_healthCount.setFont(m_game.getAssets().getFont("Megaman"));
+	m_shieldCount.setFont(m_game.getAssets().getFont("Megaman"));
+	m_speedCount.setFont(m_game.getAssets().getFont("Megaman"));
+	m_stealthCount.setFont(m_game.getAssets().getFont("Megaman"));
+
+	spawnPlayer();
 }
 
 // Spawn the player
@@ -504,6 +513,7 @@ void GameState_Play::spawnMissile(std::shared_ptr<Entity> shooter, std::shared_p
 	auto missile = m_entityManager.addEntity("Missile");
 	Vec2 target = victim->getComponent<CTransform>()->pos;
 	Vec2 current = shooter->getComponent<CTransform>()->pos;
+	missile->addComponent<CDamage>(35);
 	Vec2 difference = target - current;
 	float distance = target.dist(current);
 	Vec2 normal = difference / distance;
@@ -983,6 +993,24 @@ void GameState_Play::sCollision()
 		}
 	}
 
+	for (auto e : m_entityManager.getEntities("Missile"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(m_player, e);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			inflictDamage(e, m_player);
+			e->destroy();
+		}
+		for (auto b : m_entityManager.getEntities("Bullet"))
+		{
+			Vec2 bulletOverlap = Physics::GetOverlap(e, b);
+			if (bulletOverlap.x > 0 && bulletOverlap.y > 0)
+			{
+				b->destroy();
+				e->destroy();
+			}
+		}
+	}
 	// Check if the player has walked over any item or weapon pickups
 
 	for (auto e : m_entityManager.getEntities("HealthPot"))
