@@ -74,6 +74,8 @@ Shotgun 10 10 25 250 1000 15 8
 Rifle 15 15 25 2000 100 10 50
 Launcher 50 50 10 1000 2000 5
 Frag 5 5 30 100 18 50
-HPot HPot 0 0 10 10 5 5
-SPot SPot 0 0 10 10 1 10
+HPot HPot 0 0 3 5
+SPot SPot 0 0 5 5
+Speed Bush 0 0 7 5
+Gravity Bush 0 0 9 5 3 300
 NPC  Ganon 0  0 3  9 1 0 Patrol 2 25 2 3 9 7 9

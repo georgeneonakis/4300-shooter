@@ -17,24 +17,24 @@ x. Implement HP system
  x Make a damage component
 
 5. Items, inventory, inventory menu
- - Come up with the items
+ x Come up with the items
  x Inventory component
  x Represent items in the world / pick them up
  x Use items
  - Display inventory menu
 
-6. Add gravity component
- - Make things move properly toward an attractor
+x. Add gravity component
+ x Make things move properly toward an attractor
 
 7. Steering
  - Rockets / possibly entity steering
 
 Extras
 
-8. Reloading
+x. Reloading
  x Add ammo to weapon component
- - Display current ammo somehow
- - Have a reload button
+ x Display current ammo somehow
+ x Have a reload button
 
 x. Ricochet
  x Make some bouncing bullets
@@ -43,28 +43,26 @@ x. Ricochet
  x Make some kind of short-range dash
  - Make doors that can teleport to other areas
 
-11. Stealth
- - Make something that blocks vision but not movement
+x. Stealth
+ x Make something that blocks vision but not movement
 
 x. Explosions
  x Decide whether to do frag or actual radius explosion
 
-13. Maybe slow motion
-
 Finishing Touches
 
-14. Advanced enemy AI / Boss AI
+13. Advanced enemy AI / Boss AI
  - Possibly implement shooting AI
  - Come up with some boss AI and code it in a way that is easy to put in config file
  - Weapon-specific weaknesses / color changes
 
-15. Menu with level select / final boss
+14. Menu with level select / final boss
  - Make the menu
  - Make weapon unlocks persist across levels
  - Make it possible for the menu to recognize which levels you have beaten
 
-16. Art and sound assets
+15. Art and sound assets
  - Get all that shit otg
 
-17. Actually make the levels
+16. Actually make the levels
  - And make them good

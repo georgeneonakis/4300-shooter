@@ -42,6 +42,19 @@ void GameState_Play::loadLevel(const std::string & filename)
 			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
 		}
 
+		else if (start == "Gravity")
+		{
+			auto grav = m_entityManager.addEntity("Gravity");
+			std::string name;
+			float rx, ry, tx, ty, force, radius;
+			fin >> name >> rx >> ry >> tx >> ty >> force >> radius;
+
+			grav->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			grav->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			grav->addComponent<CBoundingBox>(grav->getComponent<CAnimation>()->animation.getSize(), false, false);
+			grav->addComponent<CGravity>(force, radius);
+		}
+
 		else if (start == "Spike")
 		{
 			auto block = m_entityManager.addEntity("Spike");
@@ -74,12 +87,12 @@ void GameState_Play::loadLevel(const std::string & filename)
 		{
 			auto block = m_entityManager.addEntity("HealthPot");
 			std::string name;
-			float rx, ry, tx, ty, bm, bv;
-			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv;
+			float rx, ry, tx, ty;
+			fin >> name >> rx >> ry >> tx >> ty;
 
-			block->addComponent<CAnimation>(m_game.getAssets().getAnimation("HPot"), true);
+			block->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
-			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), false, false);
 
 		}
 
@@ -88,13 +101,39 @@ void GameState_Play::loadLevel(const std::string & filename)
 		{
 			auto pot = m_entityManager.addEntity("ShieldPot");
 			std::string name;
-			int x, y, bm, bv;
+			int rx, ry, tx, ty;
 
-			fin >> name >> x >> y >> bm >> bv;
+			fin >> name >> rx >> ry >> tx >> ty;
 
 			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
-			pot->addComponent<CTransform>(Vec2(x, y));
-			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+			pot->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+
+		else if (start == "Speed")
+		{
+			auto pot = m_entityManager.addEntity("SpeedPot");
+			std::string name;
+			int rx, ry, tx, ty;
+
+			fin >> name >> rx >> ry >> tx >> ty;
+
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			pot->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
+		}
+
+		else if (start == "Stealth")
+		{
+			auto pot = m_entityManager.addEntity("StealthPot");
+			std::string name;
+			int rx, ry, tx, ty;
+
+			fin >> name >> rx >> ry >> tx >> ty;
+
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			pot->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
 		else if (start == "ShotgunPickup")
@@ -225,6 +264,7 @@ void GameState_Play::spawnPlayer()
 	m_player->addComponent<CAura>(0);
 	m_player->addComponent<CInventory>();
 	m_player->addComponent<CDash>(m_playerConfig.DTIME, m_playerConfig.DCOOLDOWN, m_playerConfig.DSPEED);
+	m_player->addComponent<CBuffs>(3000, 3000);
 	startreload();
 
 	player_aura = m_entityManager.addEntity("Tile");
@@ -410,7 +450,9 @@ void GameState_Play::update()
     if (!m_paused)
     {
         sAI();
+		sBuffs();
         sMovement();
+		sGravity();
         sLifespan();
         sCollision();
         sAnimation();
@@ -508,6 +550,51 @@ void GameState_Play::sSpawnMissile(std::shared_ptr<Entity> shooter, std::shared_
 
 }
 
+void GameState_Play::sGravity()
+{
+	for (auto g : m_entityManager.getEntities("Gravity"))
+	{
+		auto gravity = g->getComponent<CGravity>();
+		for (auto e : m_entityManager.getEntities())
+		{
+			if (e->tag() == "Gravity")
+			{
+				continue;
+			}
+			float distance = e->getComponent<CTransform>()->pos.dist(g->getComponent<CTransform>()->pos);
+			if (distance <= gravity->radius)
+			{
+				Vec2 difference = e->getComponent<CTransform>()->pos - g->getComponent<CTransform>()->pos;
+				Vec2 normal = difference / distance;
+				e->getComponent<CTransform>()->pos -= Vec2(normal.x * gravity->gravity, normal.y * gravity->gravity);
+			}
+		}
+	}
+}
+
+void GameState_Play::sBuffs()
+{
+	auto buffs = m_player->getComponent<CBuffs>();
+	if (buffs->isFast)
+	{
+		if (!(buffs->speedBoosted))
+		{
+			m_playerConfig.SPEED *= 2;
+			buffs->speedBoosted = true;
+		}
+		if (buffs->clock.getElapsedTime().asMilliseconds() > buffs->speedTimer)
+		{
+			m_playerConfig.SPEED /= 2;
+			buffs->isFast = false;
+			buffs->speedBoosted = false;
+		}
+	}
+	if (buffs->isStealthed && buffs->clock.getElapsedTime().asMilliseconds() > buffs->stealthTimer)
+	{
+		buffs->isStealthed = false;
+		m_player->getComponent<CBoundingBox>()->blockVision = false;
+	}
+}
 
 void GameState_Play::sSteer()
 {
@@ -613,20 +700,19 @@ void GameState_Play::sAI()
 				difference *= follow->speed;
 				e->getComponent<CTransform>()->speed = difference;
 			}
-			// If vision is not blocked, pursue player
-			int x = clock2.getElapsedTime().asMilliseconds();
-			if (x % 180 == 0) {
-				sSpawnMissile(e,m_player);
-			}
-
 			else
 			{
 				Vec2 difference = m_player->getComponent<CTransform>()->pos - e->getComponent<CTransform>()->pos;
 				float distance = m_player->getComponent<CTransform>()->pos.dist(e->getComponent<CTransform>()->pos);
 				difference /= distance;
 				difference *= follow->speed;
-				e->getComponent<CTransform>()->speed = difference;				
+				e->getComponent<CTransform>()->speed = difference;
 			}
+			// If vision is not blocked, pursue player
+			/*int x = clock2.getElapsedTime().asMilliseconds();
+			if (x % 180 == 0) {
+				sSpawnMissile(e,m_player);
+			}*/
 		}
 	}
 }
@@ -818,6 +904,28 @@ void GameState_Play::sCollision()
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
 			m_player->getComponent<CInventory>()->sPotCount++;
+			e->destroy();
+		}
+
+	}
+
+	for (auto e : m_entityManager.getEntities("SpeedPot"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			m_player->getComponent<CInventory>()->speedCount++;
+			e->destroy();
+		}
+
+	}
+
+	for (auto e : m_entityManager.getEntities("StealthPot"))
+	{
+		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
+		if (playerOverlap.x > 0 && playerOverlap.y > 0)
+		{
+			m_player->getComponent<CInventory>()->stealthCount++;
 			e->destroy();
 		}
 
@@ -1128,6 +1236,16 @@ void GameState_Play::sUserInput()
 				case sf::Keyboard::K:
 				{
 					Inventory::UseShieldPotion(m_player);
+					break;
+				}
+				case sf::Keyboard::U:
+				{
+					Inventory::UseSpeedPotion(m_player);
+					break;
+				}
+				case sf::Keyboard::I:
+				{
+					Inventory::UseStealthPotion(m_player);
 					break;
 				}
 				case sf::Keyboard::Num1:	

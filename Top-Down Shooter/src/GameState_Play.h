@@ -55,6 +55,8 @@ protected:
 	void endreload();
 	void inflictDamage(std::shared_ptr<Entity> source, std::shared_ptr<Entity> target);
 
+	void sGravity();
+	void sBuffs();
 	void sSteer();
     void sMovement();
     void sAI();

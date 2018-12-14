@@ -82,13 +82,6 @@ public:
 	CAura(int c) : color(c) {}
 };
 
-class CGravity : public Component
-{
-public:
-    float gravity;
-    CGravity(float g) : gravity(g) {}
-};
-
 class CState : public Component
 {
 public:
@@ -166,7 +159,24 @@ class CInventory : public Component
 public:
 	int hPotCount = 0;
 	int sPotCount = 0;
+	int speedCount = 0;
+	int stealthCount = 0;
 	CInventory() {}
+};
+
+class CBuffs : public Component
+{
+public:
+	sf::Clock clock;
+	bool isFast = false;
+	bool isStealthed = false;
+	bool speedBoosted = false;
+	int speedTimer = 0;
+	int stealthTimer = 0;
+	int speedDuration;
+	int stealthDuration;
+	CBuffs(int speed, int stealth)
+		: speedDuration(speed), stealthDuration(stealth) {}
 };
 
 class CDash : public Component
@@ -181,4 +191,13 @@ public:
 	int dashCooldown;
 	CDash(int duration, int cooldown, int speed)
 		: dashDuration(duration), dashCooldown(cooldown), dashSpeed(speed) {}
+};
+
+class CGravity : public Component
+{
+public:
+	int gravity;
+	float radius;
+	CGravity(int force, float rad)
+		: gravity(force), radius(rad) {}
 };
