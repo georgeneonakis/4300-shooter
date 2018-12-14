@@ -264,6 +264,12 @@ void GameState_Play::loadLevel(const std::string & filename)
 	m_playerAmmo.setCharacterSize(32);
 	m_playerAmmo.setColor(sf::Color::Black);
 
+	m_pistolSound.setBuffer(m_game.getAssets().getSound("Pistol"));
+	m_shotgunSound.setBuffer(m_game.getAssets().getSound("Shotgun"));
+	m_rifleSound.setBuffer(m_game.getAssets().getSound("Rifle"));
+	m_launcherSound.setBuffer(m_game.getAssets().getSound("Launcher"));
+	m_fragSound.setBuffer(m_game.getAssets().getSound("Frag"));
+
     spawnPlayer();
 }
 
@@ -308,6 +314,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 	{
 		if(m_player->getComponent<CWeapons>()->pistol_ammo > 0)
 		{
+			m_pistolSound.play();
 			m_player->getComponent<CWeapons>()->pistol_ammo--;
 			auto bullet = m_entityManager.addEntity("Bullet");
 			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_pistolConfig.SPEED * normal.x, m_pistolConfig.SPEED * normal.y),
@@ -329,6 +336,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 		int theta = atan2(normal.y, normal.x) * 180 / 3.14159;
 		if (m_player->getComponent<CWeapons>()->shotgun_ammo > 0 && m_player->getComponent<CWeapons>()->startreload == false)
 		{
+			m_shotgunSound.play();
 			m_player->getComponent<CWeapons>()->shotgun_ammo--;
 
 			// Calculate trajectory for each bullet in the cone
@@ -357,6 +365,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 	{
 		if (m_player->getComponent<CWeapons>()->rifle_ammo>0 && m_player->getComponent<CWeapons>()->startreload == false)
 		{
+			m_rifleSound.play();
 			m_player->getComponent<CWeapons>()->rifle_ammo--;
 			auto bullet = m_entityManager.addEntity("Bullet");
 			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_rifleConfig.SPEED * normal.x, m_rifleConfig.SPEED * normal.y),
@@ -378,6 +387,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 	{
 		if (m_player->getComponent<CWeapons>()->launcher_ammo > 0 && m_player->getComponent<CWeapons>()->startreload == false)
 		{
+			m_launcherSound.play();
 			m_player->getComponent<CWeapons>()->launcher_ammo--;
 			auto grenade = m_entityManager.addEntity("Grenade");
 			grenade->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_launcherConfig.SPEED * normal.x, m_launcherConfig.SPEED * normal.y),
@@ -781,6 +791,7 @@ void GameState_Play::sLifespan()
 
 		if (elap > life)
 		{
+			m_fragSound.play();
 			Vec2 source = e->getComponent<CTransform>()->pos;
 			for (int i = 1; i <= m_fragConfig.FIRERATE; i++)
 			{

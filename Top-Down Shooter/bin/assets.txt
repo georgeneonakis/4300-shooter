@@ -124,3 +124,8 @@ Animation BlueDino	TexBlueDino     2   15
 Font      Arial      fonts/arial.ttf
 Font      Mario      fonts/mario.ttf
 Font      Megaman    fonts/megaman.ttf
+Sound	  Pistol     sounds/pistol.wav
+Sound	  Shotgun    sounds/shotgun.wav
+Sound	  Rifle      sounds/rifle.wav
+Sound	  Launcher   sounds/launcher.wav
+Sound	  Frag       sounds/frag.wav

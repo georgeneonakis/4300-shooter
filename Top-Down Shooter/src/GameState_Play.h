@@ -36,6 +36,11 @@ protected:
 	sf::Text				m_shieldCount;
 	sf::Text				m_speedCount;
 	sf::Text				m_stealthCount;
+	sf::Sound				m_pistolSound;
+	sf::Sound				m_shotgunSound;
+	sf::Sound				m_rifleSound;
+	sf::Sound				m_launcherSound;
+	sf::Sound				m_fragSound;
     PlayerConfig            m_playerConfig;
 	WeaponConfig			m_pistolConfig;
 	WeaponConfig			m_shotgunConfig;
