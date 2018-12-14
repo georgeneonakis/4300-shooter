@@ -30,6 +30,7 @@ void GameState_Play::loadLevel(const std::string & filename)
 
 	while (std::getline(fin, start, ' '))
 	{
+		// Terrain blocks
 		if (start == "Tile")
 		{
 			auto block = m_entityManager.addEntity("Tile");
@@ -42,6 +43,7 @@ void GameState_Play::loadLevel(const std::string & filename)
 			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
 		}
 
+		// Gravity objects
 		else if (start == "Gravity")
 		{
 			auto grav = m_entityManager.addEntity("Gravity");
@@ -55,17 +57,17 @@ void GameState_Play::loadLevel(const std::string & filename)
 			grav->addComponent<CGravity>(force, radius);
 		}
 
+		// Moving spike blocks
 		else if (start == "Spike")
 		{
 			auto block = m_entityManager.addEntity("Spike");
 			std::string name,aiType;
 			float rx, ry, tx, ty, bm, bv, speed, damage;
-			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed >> damage;
-
+			fin >> name >> rx >> ry >> tx >> ty >> speed >> damage >> aiType;
 
 			block->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
-			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), bm, bv);
+			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), true, true);
 			block->addComponent<CDamage>(damage, 500);
 
 			int n;
@@ -79,30 +81,27 @@ void GameState_Play::loadLevel(const std::string & filename)
 				positions.push_back(Vec2(xi * 64 + m_windowX * rx, yi * 64 + m_windowY * ry));
 			}
 			block->addComponent<CPatrol>(positions, speed);
-
-
 		}
 
+		// Health potion
 		else if (start == "HPot")
 		{
-			auto block = m_entityManager.addEntity("HealthPot");
+			auto pot = m_entityManager.addEntity("HealthPot");
 			std::string name;
 			float rx, ry, tx, ty;
 			fin >> name >> rx >> ry >> tx >> ty;
 
-			block->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
-			block->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
-			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>()->animation.getSize(), false, false);
-
+			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
+			pot->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
+			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
-
+		// Shield potion
 		else if (start == "SPot")
 		{
 			auto pot = m_entityManager.addEntity("ShieldPot");
 			std::string name;
 			int rx, ry, tx, ty;
-
 			fin >> name >> rx >> ry >> tx >> ty;
 
 			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
@@ -110,12 +109,12 @@ void GameState_Play::loadLevel(const std::string & filename)
 			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
+		// Speed potion
 		else if (start == "Speed")
 		{
 			auto pot = m_entityManager.addEntity("SpeedPot");
 			std::string name;
 			int rx, ry, tx, ty;
-
 			fin >> name >> rx >> ry >> tx >> ty;
 
 			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
@@ -123,12 +122,12 @@ void GameState_Play::loadLevel(const std::string & filename)
 			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
+		// Stealth potion
 		else if (start == "Stealth")
 		{
 			auto pot = m_entityManager.addEntity("StealthPot");
 			std::string name;
 			int rx, ry, tx, ty;
-
 			fin >> name >> rx >> ry >> tx >> ty;
 
 			pot->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
@@ -136,12 +135,12 @@ void GameState_Play::loadLevel(const std::string & filename)
 			pot->addComponent<CBoundingBox>(pot->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
+		// Shotgun weapon
 		else if (start == "ShotgunPickup")
 		{
 			auto shotgun = m_entityManager.addEntity("Shotgun");
 			std::string name;
 			int rx, ry, tx, ty;
-
 			fin >> name >> rx >> ry >> tx >> ty;
 
 			shotgun->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
@@ -149,12 +148,12 @@ void GameState_Play::loadLevel(const std::string & filename)
 			shotgun->addComponent<CBoundingBox>(shotgun->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
+		// Auto rifle weapon
 		else if (start == "RiflePickup")
 		{
 			auto rifle = m_entityManager.addEntity("Rifle");
 			std::string name;
 			int rx, ry, tx, ty;
-
 			fin >> name >> rx >> ry >> tx >> ty;
 
 			rifle->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
@@ -162,12 +161,12 @@ void GameState_Play::loadLevel(const std::string & filename)
 			rifle->addComponent<CBoundingBox>(rifle->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
+		// Grenade launcher weapon
 		else if (start == "LauncherPickup")
 		{
 			auto launcher = m_entityManager.addEntity("Launcher");
 			std::string name;
 			int rx, ry, tx, ty;
-
 			fin >> name >> rx >> ry >> tx >> ty;
 
 			launcher->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
@@ -175,24 +174,27 @@ void GameState_Play::loadLevel(const std::string & filename)
 			launcher->addComponent<CBoundingBox>(launcher->getComponent<CAnimation>()->animation.getSize(), false, false);
 		}
 
+		// NPCs
 		else if (start == "NPC")
 		{
 			auto npc = m_entityManager.addEntity("NPC");
 			std::string name, aiType;
-			float rx, ry, tx, ty, bm, bv, speed, damage;
-			fin >> name >> rx >> ry >> tx >> ty >> bm >> bv >> aiType >> speed >> damage;
+			float rx, ry, tx, ty, speed, damage, health;
+			fin >> name >> rx >> ry >> tx >> ty >> speed >> damage >> health >> aiType;
 
-
-			bm = 1;
 			npc->addComponent<CAnimation>(m_game.getAssets().getAnimation(name), true);
 			npc->addComponent<CTransform>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64));
-			npc->addComponent<CBoundingBox>(npc->getComponent<CAnimation>()->animation.getSize(), bm, bv);
-			npc->addComponent<CHealth>(100, 0);
+			npc->addComponent<CBoundingBox>(npc->getComponent<CAnimation>()->animation.getSize(), true, false);
+			npc->addComponent<CHealth>(health, 0);
 			npc->addComponent<CDamage>(damage, 500);
+
+			// Follow AI
 			if (aiType == "Follow")
 			{
 				npc->addComponent<CFollowPlayer>(Vec2(rx * m_windowX + tx * 64, ry * m_windowY + ty * 64), speed);
 			}
+			
+			// Patrol AI
 			else
 			{
 				int n;
@@ -208,41 +210,56 @@ void GameState_Play::loadLevel(const std::string & filename)
 				npc->addComponent<CPatrol>(positions, speed);
 			}
 		}
+
+		// Player config
 		else if (start == "Player")
 		{
-			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH >> m_playerConfig.DTIME >> m_playerConfig.DCOOLDOWN >> m_playerConfig.DSPEED;
+			fin >> m_playerConfig.X >> m_playerConfig.Y >> m_playerConfig.CX >> m_playerConfig.CY >> m_playerConfig.SPEED >> m_playerConfig.HEALTH >>
+				m_playerConfig.DTIME >> m_playerConfig.DCOOLDOWN >> m_playerConfig.DSPEED >> m_playerConfig.BUFFTIME;
 		}
+
+		// Pistol config
 		else if (start == "Pistol")
 		{
 			fin >> m_pistolConfig.CX >> m_pistolConfig.CY >> m_pistolConfig.SPEED >> m_pistolConfig.LIFESPAN >> m_pistolConfig.DAMAGE >> m_pistolConfig.AMMO;
 		}
+
+		// Shotgun config
 		else if (start == "Shotgun")
 		{
 			fin >> m_shotgunConfig.CX >> m_shotgunConfig.CY >> m_shotgunConfig.SPEED >> m_shotgunConfig.LIFESPAN >> m_shotgunConfig.FIRERATE >> m_shotgunConfig.DAMAGE >> m_shotgunConfig.AMMO;
 		}
+
+		// Rifle config
 		else if (start == "Rifle")
 		{
 			fin >> m_rifleConfig.CX >> m_rifleConfig.CY >> m_rifleConfig.SPEED >> m_rifleConfig.LIFESPAN >> m_rifleConfig.FIRERATE >> m_rifleConfig.DAMAGE >> m_rifleConfig.AMMO;
 		}
+
+		// Grenade launcher config
 		else if (start == "Launcher")
 		{
 			fin >> m_launcherConfig.CX >> m_launcherConfig.CY >> m_launcherConfig.SPEED >> m_launcherConfig.LIFESPAN >> m_launcherConfig.FIRERATE >> m_launcherConfig.AMMO;
 		}
+
+		// Frag bullet config
 		else if (start == "Frag")
 		{
 			fin >> m_fragConfig.CX >> m_fragConfig.CY >> m_fragConfig.SPEED >> m_fragConfig.LIFESPAN >> m_fragConfig.FIRERATE >> m_fragConfig.DAMAGE;
 		}
 
-
 		getline(fin, empty, '\n');
 	}
 
+	// Initialize HUD text elements
 	m_playerHealth.setFont(m_game.getAssets().getFont("Megaman"));
 	m_playerHealth.setCharacterSize(32);
 	m_playerHealth.setColor(sf::Color::Red);
+
 	m_playerShields.setFont(m_game.getAssets().getFont("Megaman"));
 	m_playerShields.setCharacterSize(32);
 	m_playerShields.setColor(sf::Color::Blue);
+
 	m_playerAmmo.setFont(m_game.getAssets().getFont("Megaman"));
 	m_playerAmmo.setCharacterSize(32);
 	m_playerAmmo.setColor(sf::Color::Black);
@@ -253,8 +270,8 @@ void GameState_Play::loadLevel(const std::string & filename)
 // Spawn the player
 void GameState_Play::spawnPlayer()
 {
-
-    m_player = m_entityManager.addEntity("player");
+	// Assign all components
+    m_player = m_entityManager.addEntity("Player");
     m_player->addComponent<CTransform>(Vec2(m_playerConfig.X, m_playerConfig.Y));
     m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerM"), true);
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
@@ -264,20 +281,19 @@ void GameState_Play::spawnPlayer()
 	m_player->addComponent<CAura>(0);
 	m_player->addComponent<CInventory>();
 	m_player->addComponent<CDash>(m_playerConfig.DTIME, m_playerConfig.DCOOLDOWN, m_playerConfig.DSPEED);
-	m_player->addComponent<CBuffs>(3000, 3000);
-	startreload();
+	m_player->addComponent<CBuffs>(m_playerConfig.BUFFTIME, m_playerConfig.BUFFTIME);
 
+	// Initialize player aura
 	player_aura = m_entityManager.addEntity("Tile");
 	player_aura->addComponent<CTransform>(Vec2(m_player->getComponent<CTransform>()->pos));
 	player_aura->addComponent<CAnimation>(m_game.getAssets().getAnimation("NoAura"), true);
 	player_aura->addComponent<CBoundingBox>(Vec2(2, 2), false, false);
-
 }
 
 // Fire the current weapon at the cursor
 void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & target)
 {
-	// Calculate velocity of the bullet
+	// Calculate normal vector between player and cursor
 	auto weapon = m_player->getComponent<CWeapons>();
 	Vec2 difference = target - entity->getComponent<CTransform>()->pos;
 	float distance = target.dist(entity->getComponent<CTransform>()->pos);
@@ -286,14 +302,14 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 	{
 		m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerA"), true);
 	}
-	//std::cout << m_player->getComponent<CWeapons>()->pistol_ammo << " " << m_player->getComponent<CWeapons>()->shotgun_ammo << " " << m_player->getComponent<CWeapons>()->rifle_ammo << " " << m_player->getComponent<CWeapons>()->launcher_ammo << " \n";
+
+	// Fire pistol
 	if (weapon->current == 1 && weapon->canShoot && m_player->getComponent<CWeapons>()->startreload == false)
 	{
 		if(m_player->getComponent<CWeapons>()->pistol_ammo > 0)
 		{
 			m_player->getComponent<CWeapons>()->pistol_ammo--;
 			auto bullet = m_entityManager.addEntity("Bullet");
-			// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
 			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_pistolConfig.SPEED * normal.x, m_pistolConfig.SPEED * normal.y),
 				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
 			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("P_bullet"), true);
@@ -306,12 +322,16 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 			startreload();
 		}
 	}
+
+	// Fire shotgun
 	else if (weapon->current == 2 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
 		int theta = atan2(normal.y, normal.x) * 180 / 3.14159;
 		if (m_player->getComponent<CWeapons>()->shotgun_ammo > 0 && m_player->getComponent<CWeapons>()->startreload == false)
 		{
 			m_player->getComponent<CWeapons>()->shotgun_ammo--;
+
+			// Calculate trajectory for each bullet in the cone
 			for (int i = -16; i <= 16; i += 4)
 			{
 				int newTheta = theta + i;
@@ -326,20 +346,19 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 			}
 			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_shotgunConfig.FIRERATE;
 		}
-
 		else
 		{
 			startreload();
 		}
 	}
+
+	// Fire rifle
 	else if (weapon->current == 3 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
-
 		if (m_player->getComponent<CWeapons>()->rifle_ammo>0 && m_player->getComponent<CWeapons>()->startreload == false)
 		{
 			m_player->getComponent<CWeapons>()->rifle_ammo--;
 			auto bullet = m_entityManager.addEntity("Bullet");
-			// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
 			bullet->addComponent<CTransform>(Vec2(entity->getComponent<CTransform>()->pos), Vec2(m_rifleConfig.SPEED * normal.x, m_rifleConfig.SPEED * normal.y),
 				Vec2(1, 1), m_player->getComponent<CTransform>()->angle);
 			bullet->addComponent<CAnimation>(m_game.getAssets().getAnimation("R_bullet"), true);
@@ -353,6 +372,8 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 			startreload();
 		}
 	}
+
+	// Fire grenade launcher
 	else if (weapon->current == 4 && weapon->clock.getElapsedTime().asMilliseconds() > weapon->nextFire)
 	{
 		if (m_player->getComponent<CWeapons>()->launcher_ammo > 0 && m_player->getComponent<CWeapons>()->startreload == false)
@@ -366,7 +387,6 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 			grenade->addComponent<CLifeSpan>(m_launcherConfig.LIFESPAN);
 			weapon->nextFire = weapon->clock.getElapsedTime().asMilliseconds() + m_launcherConfig.FIRERATE;
 		}
-
 		else
 		{
 			startreload();
@@ -374,7 +394,7 @@ void GameState_Play::fireWeapon(std::shared_ptr<Entity> entity, const Vec2 & tar
 	}
 }
 
-
+// Start reloading weapons
 void GameState_Play::startreload() 
 {
 
@@ -386,11 +406,10 @@ void GameState_Play::startreload()
 
 }
 
-
+// Finish reloading
 void GameState_Play::endreload()
 {
 	int check = m_player->getComponent<CWeapons>()->currtime;
-	//	std::cout << m_player->getComponent<CWeapons>()->clock.getElapsedTime().asMilliseconds() - check << "\n";
 
 	if (m_player->getComponent<CWeapons>()->clock.getElapsedTime().asMilliseconds() > check + 2000 && m_player->getComponent<CWeapons>()->startreload)
 	{
@@ -402,6 +421,7 @@ void GameState_Play::endreload()
 	}
 }
 
+// Deal damage to an entity
 void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_ptr<Entity> target)
 {
 	auto damage = source->getComponent<CDamage>();
@@ -428,7 +448,7 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 		}
 		if (health->currentHP <= 0)
 		{
-			if (target->tag() == "player")
+			if (target->tag() == "Player")
 			{
 				m_game.popState();
 				return;
@@ -441,6 +461,22 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 	}
 }
 
+// Spawn a homing missile
+void GameState_Play::spawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
+{
+	float speed = 5.0;
+	auto missile = m_entityManager.addEntity("Missile");
+	Vec2 target = victim->getComponent<CTransform>()->pos;
+	Vec2 current = shooter->getComponent<CTransform>()->pos;
+	Vec2 difference = target - current;
+	float distance = target.dist(current);
+	Vec2 normal = difference / distance;
+	missile->addComponent<CTransform>(Vec2(shooter->getComponent<CTransform>()->pos), Vec2(normal.x * speed, normal.y * speed),
+		Vec2(1, 1), 0);
+	missile->addComponent<CAnimation>(m_game.getAssets().getAnimation("Arrow"), true);
+	missile->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
+	missile->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
+}
 
 // Game loop
 void GameState_Play::update()
@@ -522,35 +558,16 @@ void GameState_Play::sMovement()
 	{
 		e->getComponent<CTransform>()->prevPos = Vec2(e->getComponent<CTransform>()->pos);
 		e->getComponent<CTransform>()->pos += e->getComponent<CTransform>()->speed;
-		if (e->tag() == "player")
+		if (e->tag() == "Player")
 		{
 			player_aura->getComponent<CTransform>()->pos = Vec2(m_player->getComponent<CTransform>()->pos);
 			player_aura->getComponent<CTransform>()->angle = float(m_player->getComponent<CTransform>()->angle);
 			player_aura->getComponent<CTransform>()->scale = Vec2(m_player->getComponent<CTransform>()->scale);
 		}
 	}
-
-
 }
 
-
-void GameState_Play::spawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
-{
-	float speed = 5.0;
-	auto missile = m_entityManager.addEntity("Missile");
-	Vec2 target = victim->getComponent<CTransform>()->pos;
-	Vec2 current = shooter->getComponent<CTransform>()->pos;
-	Vec2 difference = target - current;
-	float distance = target.dist(current);
-	Vec2 normal = difference / distance;
-	// Assign a CTransform, CAnimation, CBoundingBox, and CLifespan component
-	missile->addComponent<CTransform>(Vec2(shooter->getComponent<CTransform>()->pos), Vec2(normal.x * speed, normal.y * speed),
-		Vec2(1, 1), 0);
-	missile->addComponent<CAnimation>(m_game.getAssets().getAnimation("Arrow"), true);
-	missile->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
-	missile->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
-}
-
+// Pull entities toward a gravity source
 void GameState_Play::sGravity()
 {
 	for (auto g : m_entityManager.getEntities("Gravity"))
@@ -573,6 +590,7 @@ void GameState_Play::sGravity()
 	}
 }
 
+// Track item buff durations
 void GameState_Play::sBuffs()
 {
 	auto buffs = m_player->getComponent<CBuffs>();
@@ -597,6 +615,7 @@ void GameState_Play::sBuffs()
 	}
 }
 
+// Steer homing missiles
 void GameState_Play::sSteer()
 {
 	float scale = 0.1;
@@ -616,14 +635,12 @@ void GameState_Play::sSteer()
 	}
 }
 
-sf::Clock clock2;
 // Generate AI behavior
 void GameState_Play::sAI()
 {
-
+	// Move spike blocks
 	for (auto e : m_entityManager.getEntities("Spike"))
 	{
-
 		// Patrol behavior
 		if (e->hasComponent<CPatrol>())
 		{
@@ -645,7 +662,6 @@ void GameState_Play::sAI()
 
 	for (auto e : m_entityManager.getEntities("NPC"))
 	{
-
 		// Patrol behavior
 		if (e->hasComponent<CPatrol>())
 		{
@@ -695,6 +711,7 @@ void GameState_Play::sAI()
 				difference *= follow->speed;
 				e->getComponent<CTransform>()->speed = difference;
 			}
+			// If vision is not blocked, pursue the player
 			else
 			{
 				Vec2 difference = m_player->getComponent<CTransform>()->pos - e->getComponent<CTransform>()->pos;
@@ -702,11 +719,6 @@ void GameState_Play::sAI()
 				difference /= distance;
 				difference *= follow->speed;
 				e->getComponent<CTransform>()->speed = difference;
-			}
-			// If vision is not blocked, pursue player
-			int x = clock2.getElapsedTime().asMilliseconds();
-			if (x % 180 == 0) {
-				spawnMissile(e,m_player);
 			}
 		}
 	}
@@ -735,6 +747,7 @@ void GameState_Play::sLifespan()
 			e->destroy();
 		}
 	}
+	// If a grenade expires, detonate it and release frag bullets
 	for (auto e : m_entityManager.getEntities("Grenade"))
 	{
 		int elap = e->getComponent<CLifeSpan>()->clock.getElapsedTime().asMilliseconds();
@@ -852,6 +865,7 @@ void GameState_Play::sCollision()
 				bullet->destroy();
 			}
 		}
+		// Check for grenade collision with tiles and bounce them off
 		for (auto grenade : m_entityManager.getEntities("Grenade"))
 		{
 			Vec2 grenadeOverlap = Physics::GetOverlap(e, grenade);
@@ -892,6 +906,8 @@ void GameState_Play::sCollision()
 		}
 	}
 
+	// Check if the player has walked over any item or weapon pickups
+
 	for (auto e : m_entityManager.getEntities("HealthPot"))
 	{
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
@@ -902,7 +918,6 @@ void GameState_Play::sCollision()
 		}
 
 	}
-
 	for (auto e : m_entityManager.getEntities("ShieldPot"))
 	{
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
@@ -911,9 +926,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CInventory>()->sPotCount++;
 			e->destroy();
 		}
-
 	}
-
 	for (auto e : m_entityManager.getEntities("SpeedPot"))
 	{
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
@@ -922,9 +935,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CInventory>()->speedCount++;
 			e->destroy();
 		}
-
 	}
-
 	for (auto e : m_entityManager.getEntities("StealthPot"))
 	{
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
@@ -933,9 +944,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CInventory>()->stealthCount++;
 			e->destroy();
 		}
-
 	}
-
 	for (auto e : m_entityManager.getEntities("Shotgun"))
 	{
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
@@ -944,9 +953,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CWeapons>()->hasTwo = true;
 			e->destroy();
 		}
-
 	}
-
 	for (auto e : m_entityManager.getEntities("Rifle"))
 	{
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
@@ -955,9 +962,7 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CWeapons>()->hasThree = true;
 			e->destroy();
 		}
-
 	}
-
 	for (auto e : m_entityManager.getEntities("Launcher"))
 	{
 		Vec2 playerOverlap = Physics::GetOverlap(e, m_player);
@@ -966,9 +971,9 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CWeapons>()->hasFour = true;
 			e->destroy();
 		}
-
 	}
 
+	// Collisions with spikes
 	for (auto e : m_entityManager.getEntities("Spike"))
 	{
 		if (!e->getComponent<CBoundingBox>()->blockMove)

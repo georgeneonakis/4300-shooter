@@ -1,9 +1,11 @@
 ﻿  GameState_Play.cpp
-c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(242): warning C4996: 'sf::Text::setColor': was declared deprecated
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(257): warning C4996: 'sf::Text::setColor': was declared deprecated
   c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
-c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(245): warning C4996: 'sf::Text::setColor': was declared deprecated
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(261): warning C4996: 'sf::Text::setColor': was declared deprecated
   c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
-c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(248): warning C4996: 'sf::Text::setColor': was declared deprecated
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(265): warning C4996: 'sf::Text::setColor': was declared deprecated
   c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
-c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(602): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bv': unreferenced local variable
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bm': unreferenced local variable
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(621): warning C4305: 'initializing': truncation from 'double' to 'float'
   SFMLGame.vcxproj -> C:\Users\George\Documents\Work\4300\Project\Top-Down Shooter\visualstudio\../bin/SFMLGame_d.exe
