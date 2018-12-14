@@ -2,4 +2,8 @@ Player Sprites - https://opengameart.org/content/top-down-mage-animations?fbclid
 
 Zelda Boss Sprites (Dragon, Dinosaur, Ganon) - https://www.spriters-resource.com/nes/legendofzelda/sheet/36632/
 
+Chicken Sprite - https://opengameart.org/content/solarus-chicken
+
+Mario Sprites (Goomba, Shell, BlueDino) - http://www.mariouniverse.com/sprites-nes-smb3/
+
 All other sprites were original designs by The Boyz

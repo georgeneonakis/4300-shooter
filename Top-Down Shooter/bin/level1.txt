@@ -1,5 +1,5 @@
 NPC  Shell  0  0 15 10 5 25 100 Patrol 4 15 10 15 7 17 7 17 10
-NPC  Goomba   0  0 16  6 1 25 100 Follow
+NPC  Chicken   0  0 16  6 1 25 100 Follow
 Spike SpikeBlock 0 0 10 10 2 35 Patrol 2 10 7 10 11
 Tile Bush     0  0 14  6 1 1
 Tile RockBM   0 -1  4  5 1 1
