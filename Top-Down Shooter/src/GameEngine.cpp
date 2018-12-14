@@ -80,6 +80,36 @@ void GameEngine::quit()
     m_running = false;
 }
 
+bool GameEngine::hasShotgun()
+{
+	return m_shotgun;
+}
+
+bool GameEngine::hasRifle()
+{
+	return m_rifle;
+}
+
+bool GameEngine::hasLauncher()
+{
+	return m_launcher;
+}
+
+void GameEngine::getShotgun()
+{
+	m_shotgun = true;
+}
+
+void GameEngine::getRifle()
+{
+	m_rifle = true;
+}
+
+void GameEngine::getLauncher()
+{
+	m_launcher = true;
+}
+
 const Assets & GameEngine::getAssets() const
 {
     return m_assets;

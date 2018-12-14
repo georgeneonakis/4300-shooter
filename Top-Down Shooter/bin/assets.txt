@@ -56,6 +56,9 @@ Texture   TexRFW	images/ours/rifle_weapon.png
 Texture   TexGFloor	images/ours/grey_floor.png
 Texture   TexWall	images/ours/grey_wall.png
 Texture   TexDeath	images/ours/player-die.png
+Texture   TexGoomba	images/ours/goomba.png
+Texture	  TexShell	images/ours/shell.png
+Texture   TexBlueDino   images/ours/bluedino.png
 Animation PlayerDeath	TexDeath	8    15
 Animation GreyFloor	TexGFloor       1    0
 Animation GreyWall	TexWall		1    0
@@ -115,6 +118,9 @@ Animation WaterBL       TexWaterBL      1    0
 Animation WaterBM       TexWaterBM      1    0
 Animation WaterBR       TexWaterBR      1    0
 Animation Bush          TexBush         1    0
+Animation Goomba	TexGoomba	3   10
+Animation Shell		TexShell	4   10
+Animation BlueDino	TexBlueDino     2   15
 Font      Arial      fonts/arial.ttf
 Font      Mario      fonts/mario.ttf
 Font      Megaman    fonts/megaman.ttf

@@ -1,11 +1,11 @@
 ﻿  GameState_Play.cpp
-c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(257): warning C4996: 'sf::Text::setColor': was declared deprecated
-  c:\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
-c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(261): warning C4996: 'sf::Text::setColor': was declared deprecated
-  c:\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
-c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(265): warning C4996: 'sf::Text::setColor': was declared deprecated
-  c:\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
-c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bv': unreferenced local variable
-c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bm': unreferenced local variable
-c:\users\kishoto\documents\github\4300-shooter\top-down shooter\src\gamestate_play.cpp(648): warning C4305: 'initializing': truncation from 'double' to 'float'
-  SFMLGame.vcxproj -> C:\Users\Kishoto\Documents\GitHub\4300-shooter\Top-Down Shooter\visualstudio\../bin/SFMLGame_d.exe
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(257): warning C4996: 'sf::Text::setColor': was declared deprecated
+  c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(261): warning C4996: 'sf::Text::setColor': was declared deprecated
+  c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(265): warning C4996: 'sf::Text::setColor': was declared deprecated
+  c:\users\george\documents\work\4300\sfml-2.5.0\include\sfml\graphics\text.hpp(210): note: see declaration of 'sf::Text::setColor'
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bv': unreferenced local variable
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bm': unreferenced local variable
+c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(647): warning C4305: 'initializing': truncation from 'double' to 'float'
+  SFMLGame.vcxproj -> C:\Users\George\Documents\Work\4300\Project\Top-Down Shooter\visualstudio\../bin/SFMLGame_d.exe

@@ -276,7 +276,7 @@ void GameState_Play::spawnPlayer()
     m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("PlayerSt"), true);
 	m_player->addComponent<CBoundingBox>(Vec2(m_playerConfig.CX, m_playerConfig.CY), false, false);
     m_player->addComponent<CInput>();
-	m_player->addComponent<CWeapons>(false, false, false);
+	m_player->addComponent<CWeapons>(m_game.hasShotgun(), m_game.hasRifle(), m_game.hasLauncher());
 	m_player->addComponent<CHealth>(m_playerConfig.HEALTH, 100);
 	m_player->addComponent<CAura>(0);
 	m_player->addComponent<CInventory>();
@@ -464,7 +464,6 @@ void GameState_Play::inflictDamage(std::shared_ptr<Entity> source, std::shared_p
 		}
 	}
 }
-
 
 
 void GameState_Play::playerdeath()
@@ -978,6 +977,7 @@ void GameState_Play::sCollision()
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
 			m_player->getComponent<CWeapons>()->hasTwo = true;
+			m_game.getShotgun();
 			e->destroy();
 		}
 	}
@@ -987,6 +987,7 @@ void GameState_Play::sCollision()
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
 			m_player->getComponent<CWeapons>()->hasThree = true;
+			m_game.getRifle();
 			e->destroy();
 		}
 	}
@@ -996,6 +997,7 @@ void GameState_Play::sCollision()
 		if (playerOverlap.x > 0 && playerOverlap.y > 0)
 		{
 			m_player->getComponent<CWeapons>()->hasFour = true;
+			m_game.getLauncher();
 			e->destroy();
 		}
 	}

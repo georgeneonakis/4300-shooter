@@ -17,6 +17,9 @@ protected:
     Assets                                  m_assets;
     size_t                                  m_popStates = 0;
     bool                                    m_running = true;
+	bool									m_shotgun = false;
+	bool									m_rifle = false;
+	bool									m_launcher = false;
 
     void init(const std::string & path);
     void update();
@@ -35,6 +38,14 @@ public:
 
     sf::RenderWindow & window();
     bool isRunning();
+
+	bool hasShotgun();
+	bool hasRifle();
+	bool hasLauncher();
+
+	void getShotgun();
+	void getRifle();
+	void getLauncher();
 
     const Assets & getAssets() const;
 };
