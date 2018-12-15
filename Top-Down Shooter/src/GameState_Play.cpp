@@ -661,7 +661,7 @@ void GameState_Play::sGravity()
 		auto gravity = g->getComponent<CGravity>();
 		for (auto e : m_entityManager.getEntities())
 		{
-			if (e->tag() == "Gravity")
+			if (e->tag() == "Gravity" || e->tag() == "Tile")
 			{
 				continue;
 			}
