@@ -1181,7 +1181,7 @@ NPC Tektite 0 0 8 25 3 1 31 Follow
 NPC Tektite 0 0 10 25 3 1 31 Follow
 NPC Tektite 0 0 9 26 3 1 31 Follow
 NPC Tektite 0 0 8 27 3 1 31 Follow
-NPC Dragon 0 0 13 13 3 20 500 Follow 
+NPC Dragon 0 0 13 13 3 35 700 Follow 
 RiflePickup RifleItem 0 0 17 13
 Player 1880 560 48 48 5 100 200 1000 3 3000
 Pistol 20 20 25 2000 30 20
