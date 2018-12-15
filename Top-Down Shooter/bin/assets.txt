@@ -61,7 +61,9 @@ Texture   TexDeath	images/ours/player-die.png
 Texture   TexGoomba	images/ours/goomba.png
 Texture	  TexShell	images/ours/shell.png
 Texture   TexBlueDino   images/ours/bluedino.png
-Texture   TexChicken	images/ours/chicken.png
+Texture   TexChicken	images/ours/big_chicken.png
+Texture   TexGrav	images/ours/gravity_well.png
+Animation Gravity	TexGrav		7    15
 Animation PlayerDeath	TexDeath	8    15
 Animation GreyFloor	TexGFloor       1    0
 Animation GreyWall	TexWall		1    0
