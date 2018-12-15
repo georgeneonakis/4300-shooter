@@ -1279,8 +1279,8 @@ Tile GreyWall 0 0 26 8 1 1
 Tile GreyWall 0 0 26 9 1 1
 NPC Goomba 0 0 24 11 3 20 80 Patrol 2 24 11 24 10
 NPC Goomba 0 0 32 11 3 20 80 Patrol 2 32 11 32 10
-NPC Goomba 0 0 24 14 3 20 80 Patrol 2 24 14 24 15
-NPC Goomba 0 0 32 14 3 20 80 Patrol 2 32 14 32 15
+NPC Goomba 0 0 24 14 3 20 80 Patrol 2 24 14 27 18
+NPC Goomba 0 0 32 14 3 20 80 Patrol 2 32 14 29 18
 NPC Goomba 0 0 11 18 3 20 80 Follow
 NPC Goomba 0 0 22 22 3 20 80 Follow
 NPC Goomba 0 0 6 24 3 20 80 Follow
@@ -1294,7 +1294,7 @@ NPC Goomba 0 0 6 33 3 20 80 Follow
 NPC Goomba 0 0 15 33 3 20 80 Follow
 NPC Goomba 0 0 18 33 3 20 80 Follow
 NPC BlueDino 0 0 31 30 3 20 160 Patrol 2 31 30 22 30
-NPC BlueDino 0 0 22 28 3 20 160 Patrol 2 31 28 22 28
+NPC BlueDino 0 0 22 28 3 20 160 Patrol 2 31 32 22 32
 NPC Dinosaur 0 0 28 11 3 20 500 Patrol 2 26 11 30 11
 ShotgunPickup ShotgunItem 0 0 28 7
 Player 640 460 48 48 5 100 200 1000 3 3000
