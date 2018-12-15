@@ -6,4 +6,6 @@ Chicken Sprite - https://opengameart.org/content/solarus-chicken
 
 Mario Sprites (Goomba, Shell, BlueDino) - http://www.mariouniverse.com/sprites-nes-smb3/
 
+Sound Effects - https://opengameart.org/content/512-sound-effects-8-bit-style
+
 All other sprites were original designs by The Boyz
