@@ -29,7 +29,7 @@ Texture   TexWaterBM    images/tloz/green/tile_water_bm.png
 Texture   TexWaterBR    images/tloz/green/tile_water_br.png
 Texture   TexBush       images/tloz/green/tile_bush.png
 Texture   TexBlack      images/tloz/tile_black.png
-Texture   TexTektite    images/tloz/spiny.png
+Texture   TexTektite    images/ours/spiny.png
 Texture   TexKnight     images/tloz/knight.png
 Texture   TexArrow	images/tloz/item_arrow_right.png
 Texture	  TexWB		images/ours/white_bullet.png

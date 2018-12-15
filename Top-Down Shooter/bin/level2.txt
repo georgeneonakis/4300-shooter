@@ -971,8 +971,7 @@ Tile GreyWall 0 0 20 17 1 1
 Tile GreyWall 0 0 36 17 1 1  
 Tile GreyWall 0 0 5 18 1 1  
 Tile GreyWall 0 0 6 18 1 1  
-Tile GreyWall 0 0 8 18 1 1  
-Tile GreyWall 0 0 11 18 1 1  
+Tile GreyWall 0 0 8 18 1 1   
 Tile GreyWall 0 0 12 18 1 1  
 Tile GreyWall 0 0 13 18 1 1  
 Tile GreyWall 0 0 14 18 1 1  
@@ -1168,19 +1167,19 @@ Spike SpikeBlock 0 0 28 22 5 20 Patrol 26 27 22	28 22	29 22	30 23	31 24	32 25	33
 Spike SpikeBlock 0 0 21 21 5 20 Patrol 26 27 22	28 22	29 22	30 23	31 24	32 25	33 26	34 27	34 28	33 29	32 30	31 31	30 32	29 33	28 33	27 33	26 32	25 31	24 30	23 29	22 28	22 27	23 26	24 25	25 24	26 23
 Spike SpikeBlock 0 0 35 34 5 20 Patrol 26 27 22	28 22	29 22	30 23	31 24	32 25	33 26	34 27	34 28	33 29	32 30	31 31	30 32	29 33	28 33	27 33	26 32	25 31	24 30	23 29	22 28	22 27	23 26	24 25	25 24	26 23
 Spike SpikeBlock 0 0 27 30 5 20 Patrol 12 27 25	28 25	29 26	30 27	30 28	29 29	28 30	27 30	26 29	25 28	25 27	26 26
-NPC Tektite 0 0 7 8 3 1 31 Follow
-NPC Tektite 0 0 10 19 3 1 31 Follow
-NPC Tektite 0 0 9 22 3 1 31 Follow
-NPC Tektite 0 0 8 23 3 1 31 Follow
-NPC Tektite 0 0 10 23 3 1 31 Follow
-NPC Tektite 0 0 7 24 3 1 31 Follow
-NPC Tektite 0 0 9 24 3 1 31 Follow
-NPC Tektite 0 0 11 24 3 1 31 Follow
-NPC Tektite 0 0 7 25 3 1 31 Follow
-NPC Tektite 0 0 8 25 3 1 31 Follow
-NPC Tektite 0 0 10 25 3 1 31 Follow
-NPC Tektite 0 0 9 26 3 1 31 Follow
-NPC Tektite 0 0 8 27 3 1 31 Follow
+NPC Tektite 0 0 7 8 3 10 31 Follow
+NPC Tektite 0 0 10 19 3 10 31 Follow
+NPC Tektite 0 0 9 22 3 10 31 Follow
+NPC Tektite 0 0 8 23 3 10 31 Follow
+NPC Tektite 0 0 10 23 3 10 31 Follow
+NPC Tektite 0 0 7 24 3 10 31 Follow
+NPC Tektite 0 0 9 24 3 10 31 Follow
+NPC Tektite 0 0 11 24 3 10 31 Follow
+NPC Tektite 0 0 7 25 3 10 31 Follow
+NPC Tektite 0 0 8 25 3 10 31 Follow
+NPC Tektite 0 0 10 25 3 10 31 Follow
+NPC Tektite 0 0 9 26 3 10 31 Follow
+NPC Tektite 0 0 8 27 3 10 31 Follow
 NPC Dragon 0 0 13 13 3 35 700 Follow 
 RiflePickup RifleItem 0 0 17 13
 Player 1880 560 48 48 5 100 200 1000 3 3000
