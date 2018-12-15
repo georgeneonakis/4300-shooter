@@ -1521,44 +1521,36 @@ void GameState_Play::sRender()
 		rect.setFillColor(sf::Color::Black);
 		rect.setOutlineThickness(5);
 
-		sf::RectangleShape healthRect;
-		healthRect.setSize(sf::Vector2f(64, 64));
-		//healthRect.setTexture(m_game.getAssets().getAnimation("HPot").getSprite());
-		//healthRect.setTexture((sf::Texture)health->getComponent<CAnimation>()->animation.getName());
+		sf::Sprite healthRect;
+		healthRect.setTexture(m_game.getAssets().getTexture("TexHP"));
 		healthRect.setPosition(pPos->pos.x + 320, pPos->pos.y - 270);
 
-		sf::RectangleShape shieldRect;
-		shieldRect.setSize(sf::Vector2f(64, 64));
-		//shieldRect.setTexture();
+		sf::Sprite shieldRect;
+		shieldRect.setTexture(m_game.getAssets().getTexture("TexSP"));
 		shieldRect.setPosition(pPos->pos.x + 484, pPos->pos.y - 270);
 
-		sf::RectangleShape speedRect;
-		speedRect.setSize(sf::Vector2f(64, 64));
+		sf::Sprite speedRect;
+		speedRect.setTexture(m_game.getAssets().getTexture("TexSpeed"));
 		speedRect.setPosition(pPos->pos.x + 320, pPos->pos.y - 156);
 
-		sf::RectangleShape stealthRect;
-		stealthRect.setSize(sf::Vector2f(64, 64));
+		sf::Sprite stealthRect;
+		stealthRect.setTexture(m_game.getAssets().getTexture("TexStealth"));
 		stealthRect.setPosition(pPos->pos.x + 484, pPos->pos.y - 156);
 
-		sf::RectangleShape w1Rect;
-		w1Rect.setSize(sf::Vector2f(64, 64));
-		//shieldRect.setTexture();
-		w1Rect.setPosition(pPos->pos.x + 320, pPos->pos.y + 60);
+		sf::Sprite w1Sprite;
+		w1Sprite.setTexture(m_game.getAssets().getTexture("TexSGW"));
+		w1Sprite.setTextureRect(sf::IntRect(0, 0, 48, 48));
+		w1Sprite.setPosition(pPos->pos.x + 320, pPos->pos.y + 60);
 
-		sf::RectangleShape w2Rect;
-		w2Rect.setSize(sf::Vector2f(64, 64));
-		//shieldRect.setTexture();
-		w2Rect.setPosition(pPos->pos.x + 484, pPos->pos.y + 60);
+		sf::Sprite w2Sprite;
+		w2Sprite.setTexture(m_game.getAssets().getTexture("TexRFW"));
+		w2Sprite.setTextureRect(sf::IntRect(0, 0, 48, 48));
+		w2Sprite.setPosition(pPos->pos.x + 384, pPos->pos.y + 60);
 
-		sf::RectangleShape w3Rect;
-		w3Rect.setSize(sf::Vector2f(64, 64));
-		//shieldRect.setTexture();
-		w3Rect.setPosition(pPos->pos.x + 320, pPos->pos.y + 174);
-
-		sf::RectangleShape w4Rect;
-		w4Rect.setSize(sf::Vector2f(64, 64));
-		//shieldRect.setTexture();
-		w4Rect.setPosition(pPos->pos.x + 484, pPos->pos.y + 174);
+		sf::Sprite w3Sprite;
+		w3Sprite.setTexture(m_game.getAssets().getTexture("TexFRW"));
+		w3Sprite.setTextureRect(sf::IntRect(0, 0, 48, 48));
+		w3Sprite.setPosition(pPos->pos.x + 448, pPos->pos.y + 60);
 
 		m_healthCount.setPosition(pPos->pos.x + 384, pPos->pos.y - 206);
 		m_healthCount.setCharacterSize(12);
@@ -1582,10 +1574,19 @@ void GameState_Play::sRender()
 		m_game.window().draw(shieldRect);
 		m_game.window().draw(speedRect);
 		m_game.window().draw(stealthRect);
-		m_game.window().draw(w1Rect);
-		m_game.window().draw(w2Rect);
-		m_game.window().draw(w3Rect);
-		m_game.window().draw(w4Rect);
+
+		if (m_player->getComponent<CWeapons>()->hasTwo)
+		{
+			m_game.window().draw(w1Sprite);
+		}
+		if (m_player->getComponent<CWeapons>()->hasThree)
+		{
+			m_game.window().draw(w2Sprite);
+		}
+		if (m_player->getComponent<CWeapons>()->hasFour)
+		{
+			m_game.window().draw(w3Sprite);
+		}
 		m_game.window().draw(m_itemLabel);
 		m_game.window().draw(m_weaponLabel);
 		m_game.window().draw(m_healthCount);

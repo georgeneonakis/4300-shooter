@@ -9,7 +9,7 @@ c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.
 c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(65): warning C4101: 'bm': unreferenced local variable
 c:\users\george\documents\work\4300\project\top-down shooter\src\gamestate_play.cpp(707): warning C4305: 'initializing': truncation from 'double' to 'float'
   Generating code
-  2 of 1865 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  1 of 1865 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     2 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
