@@ -506,20 +506,20 @@ void GameState_Play::playerdeath()
 
 
 }
-// Spawn a homing missile
+// Sdpawn a homing missile
 void GameState_Play::spawnMissile(std::shared_ptr<Entity> shooter, std::shared_ptr<Entity> victim)
 {
 	float speed = 5.0;
 	auto missile = m_entityManager.addEntity("Missile");
 	Vec2 target = victim->getComponent<CTransform>()->pos;
 	Vec2 current = shooter->getComponent<CTransform>()->pos;
-	missile->addComponent<CDamage>(35);
+	missile->addComponent<CDamage>(25);
 	Vec2 difference = target - current;
 	float distance = target.dist(current);
 	Vec2 normal = difference / distance;
 	missile->addComponent<CTransform>(Vec2(shooter->getComponent<CTransform>()->pos), Vec2(normal.x * speed, normal.y * speed),
 		Vec2(1, 1), 0);
-	missile->addComponent<CAnimation>(m_game.getAssets().getAnimation("Arrow"), true);
+	missile->addComponent<CAnimation>(m_game.getAssets().getAnimation("DarkBlast"), true);
 	missile->addComponent<CBoundingBox>(Vec2(m_pistolConfig.CX, m_pistolConfig.CY), false, false);
 	missile->addComponent<CLifeSpan>(m_pistolConfig.LIFESPAN);
 }
@@ -743,12 +743,22 @@ void GameState_Play::sAI()
 			difference /= distance;
 			difference *= patrol->speed;
 			e->getComponent<CTransform>()->speed = difference;
+
+
 		}
 	}
 
 	for (auto e : m_entityManager.getEntities("NPC"))
 	{
 		// Patrol behavior
+		bool check = false;
+		for (auto thing : m_entityManager.getEntities())
+		{
+			if (thing->tag() == "Missile")
+			{
+				check = true;
+			}
+		}
 		if (e->hasComponent<CPatrol>())
 		{
 			auto patrol = e->getComponent<CPatrol>();
@@ -764,6 +774,11 @@ void GameState_Play::sAI()
 			difference /= distance;
 			difference *= patrol->speed;
 			e->getComponent<CTransform>()->speed = difference;
+
+			if (e->getComponent<CAnimation>()->animation.getName() == "Ganon" && !check)
+			{
+				spawnMissile(e, m_player);
+			}
 		}
 		// Follow behavior
 		else

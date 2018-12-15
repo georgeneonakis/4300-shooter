@@ -63,6 +63,8 @@ Texture	  TexShell	images/ours/shell.png
 Texture   TexBlueDino   images/ours/bluedino.png
 Texture   TexChicken	images/ours/big_chicken.png
 Texture   TexGrav	images/ours/gravity_well.png
+Texture   TexDB		images/ours/darkblast.png
+Animation DarkBlast	TexDB		3    10
 Animation Gravity	TexGrav		7    15
 Animation PlayerDeath	TexDeath	8    15
 Animation GreyFloor	TexGFloor       1    0
